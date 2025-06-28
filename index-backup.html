@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrie Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="./assets/css/modal.css">
+    <link rel="stylesheet" href="./assets/css/about.css">
+
+</head>
+
+<body>
+    <header class="main-heder">
+        <div class="header-row">
+            <div class="mobilelogo">
+                <img src="./assets/images/carrie-logo.svg" alt="">
+            </div>
+            <div class="mobile-humberger">
+                <img src="./assets/images/humberger.svg" alt="">
+            </div>
+        </div>
+        <div class="header-divider"></div>
+    </header>
+    <section class="main-carrie-sec">
+         <nav class="navbar-2 navbar-desktop2">
+    <div class="nav-links">
+      <a href="javascript:void(0)" data-attr="about-us" class="about-us sec-pages">About Us</a>
+     
+    </div>
+
+  </nav>
+ <nav class="navbar navbar-desktop">
+    <div class="nav-links">
+      <a href="#">How Carrie Works</a>
+      <a href="#">Pricing</a>
+      <a href="javascript:void(0);" class="signup">Signup</a>
+      <a href="javascript:void(0);" class="openLoginModal">Login</a>
+      <a href="javascript:void(0);" class="logout hidden">Logout</a>
+    </div>
+
+  </nav>
+        <div class="row">
+
+            <div class="sidebar">
+                <div class="close-icon">
+                    X
+                </div>
+                <div class="main-logo">
+                    <img src="./assets/images/carrie-logo-f.png" alt="" class="desktop-fav">
+                    <img src="./assets/images/carrie-logo.svg" alt="" class="mobile-humberger-logo">
+                </div>
+                <div class="sidebar-items">
+                    <a href="#" class="items-link plus">
+                        <div class="item">
+                            <img src="./assets/images/plus.svg" alt="" class="item-img">
+                        </div>
+                    </a>
+                    <a href="#" class="items-link home">
+                        <div class="item">
+                            <div class="item-img-div active"><img src="./assets/images/home-search.svg" alt=""
+                                    class="item-img"></div>
+                            <div class="item-tit-div">
+                                <h3 class="items-title">Home</h3>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="#" class="items-link">
+                        <div class="item">
+                            <div class="item-img-div"><img src="./assets/images/discover.svg" alt="" class="item-img">
+                            </div>
+                            <div class="item-tit-div">
+                                <h3 class="items-title">Discover</h3>
+                            </div>
+                        </div>
+                    </a>
+
+
+                </div>
+                <nav class="navbar navbar-mobile">
+                <div class="nav-links">
+                <a href="#">How Carrie Works</a>
+                <a href="#">Pricing</a>
+                <a href="javascript:void(0);" class="signup">Signup</a>
+                <a href="javascript:void(0);" class="openLoginModal">Login</a>
+                <a href="javascript:void(0);" class="logout hidden">Logout</a>
+                <a href="#" data-attr="about-us" class="about-us sec-pages">About Us</a>
+                </div>
+
+            </nav>
+
+            </div>
+
+            <div class="menu-sidebar">
+
+                <div class="title-div">
+                    <div class="title">
+                        <h3 class="sidebar-menus-title">Home
+                            <img src="./assets/images/arrow.svg" alt="">
+                            <span class="tooltip-text">
+                                <img src="./assets/images/customize-sidebar.svg" alt="">
+                                Customize
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="img-d">
+                        <img src="./assets/images/pin.svg" alt="">
+                    </div>
+                </div>
+
+                <div class="menu-items">
+                    <ul>
+                        <li class="list-item">
+                            <a href="#">
+                                <div class="icon"><img src="./assets/images/finance.svg" alt=""></div>
+                                <div class="title">
+                                    <h3>Finance</h3>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="list-item">
+                            <a href="#">
+                                <div class="icon"><img src="./assets/images/travel.svg" alt=""></div>
+                                <div class="title">
+                                    <h3>Travel</h3>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="list-item">
+                            <a href="#">
+                                <div class="icon"><img src="./assets/images/academic.svg" alt=""></div>
+                                <div class="title">
+                                    <h3>Academic</h3>
+                                </div>
+                            </a>
+                        </li>
+
+
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="main main-search">
+                <div class="container page-item">
+                    <div class="main-logo-div">
+                        <img src="./assets/images/carrie-logo.png" alt="">
+                        <h3 class="main-logo-div-title">What do you want to know?</h3>
+                    </div>
+                    <div id="search-content-box">
+                        <div class="page-container">
+                            <h1 class="search-heading"></h1><span id="titleLoader" class="loader-hidden"></span>
+                            <div class="full-width-row">
+                                
+                            </div>
+                            <div class="message-window">
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="pos-abs-con">
+                        <div class="search-box">
+                            <div class="search-row">
+                                
+                                <textarea name="ai_search" id="ai_search" name="ai_search" placeholder="Search, Ask, or Write Anything!"></textarea>
+                            </div>
+                            <div class="button-row">
+                                <div class="button-group">
+                                    
+                                </div>
+                                <div class="icons-group">
+                                    <ul class="icons-g-main">
+                                        <li><a href="javascript:void(0)"><img src="./assets/images/table.svg" alt=""></a></li>
+
+                                        <!-- <label><input type="file" class="hidden" name="file1"><img class="h-6 w-6" alt="Image here" src="./assets/images/document.svg"></label> -->
+
+                                        <li><a href="javascript:void(0)"><label><input type="file" class="hidden" id="file1" name="file1" accept="image/png"><img src="./assets/images/document.svg" alt=""></label></a></li>
+                                        <li class="active enter"><a href="javascript:void(0)"><img src="./assets/images/enter.svg" alt=""></a></li>
+                                        <li class="active arrow"><a href="javascript:void(0)"><img src="./assets/images/arrow-right.svg" alt=""></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="about-us-page hidden page-item">
+                    <div class="main-logo-div">
+                        <img src="./assets/images/carrie-logo.png" alt="">
+                        <h3 class="main-logo-div-title">What do you want to know?</h3>
+                    </div>
+                    <div class="grid-layout">
+                        <div class="image-section">
+                            <img src="./assets/images/about-page-image.avif" alt="Carrie Search Placeholder Image">
+                        </div>
+
+                        <div class="content-section">
+                            <h1>
+                                Carrie Search — The Easiest Way to Search, Ask, and Write
+                            </h1>
+
+                            <p>
+                                Carrie Search is your all-in-one platform for searching, asking questions, and writing anything—quickly and effortlessly. As a smarter, more intuitive alternative to Google and ChatGPT, Carrie Search is designed to make your digital life easier, more productive, and more meaningful.
+                            </p>
+
+                            <h2>Why Carrie Search?</h2>
+                            <ul>
+                                <li><strong class="text-blue-700">Effortless Searching:</strong> Find accurate answers fast, every time.</li>
+                                <li><strong class="text-blue-700">Ask Anything:</strong> Get clear, reliable responses to any question.</li>
+                                <li><strong class="text-blue-700">Write With Confidence:</strong> From emails to essays, Carrie Search helps you craft your best work.</li>
+                                <li><strong class="text-blue-700">Integrated Simplicity:</strong> Search, ask, and write in one seamless experience.</li>
+                                <li><strong class="text-blue-700">Privacy First:</strong> Your searches and questions are always safe and secure.</li>
+                            </ul>
+
+                            <p style="margin-top: 24px;">
+                                <strong class="text-red-600">Still using Google? Why?</strong>
+                                Carrie Search gives you more—making your life easier while making a real difference in the world.
+                            </p>
+
+                            <h2>Powered by Purpose</h2>
+                            <p>
+                                Carrie Search is proudly provided by <strong class="text-green-700">Essential Families</strong>, a Missouri nonprofit 501(c)(3).
+                            </p>
+                            <p>
+                                For a small monthly fee of just <strong class="text-green-700">$9.97</strong>, you are directly funding Essential Families’ Essential Mobility Program. This program is dedicated to enabling economic mobility for unserved and underserved families in urban and rural communities across the country.
+                            </p>
+
+                            <h2>Your Impact</h2>
+                            <p>
+                                Every time you use Carrie Search, you help provide:
+                            </p>
+                            <ul>
+                                <li>Free brand new Chromebook and 6 months of internet access for urban and rural families in need</li>
+                                <li>Digital skills training and 24/7 telehealth support</li>
+                                <li>24/7 Parenting resources, emergency assistance, and more</li>
+                                <li>Pathways to economic mobility and brighter futures</li>
+                            </ul>
+
+                            <p style="margin-top: 24px;">
+                                Essential Families is committed to enabling economic mobility and building opportunity—one search at a time.
+                            </p>
+
+                            <blockquote style="margin-top: 24px;">
+                                “We’re giving unserved and underserved urban and rural children and families ACCESS to change their lives, to make them stable, then enabling them to participate in the digital economy.”
+                                <footer>
+                                    — Terri English-Yancy, Founder of Essential Families
+                                </footer>
+                            </blockquote>
+
+                            <h2 style="margin-top: 24px;">Sign Up Today!</h2>
+                            <p>
+                                Carrie Search isn’t just about making your life easier—it’s about creating opportunity, stability, and hope for unserved and underserved urban and rural children and families nationwide.
+                            </p>
+                            <p>
+                                Why settle for ordinary when you can get more, give more, and help change lives?
+                            </p>
+
+                            <p class="final-heading">
+                                Carrie Search: Making Searching, Asking, and Writing Easier—For You and for the World
+                            </p>
+                            <p class="final-paragraph">
+                                Powered by Essential Families.
+                            </p>
+                            <p class="final-paragraph">
+                                Creating opportunity, stability, and economic mobility for all.
+                            </p>
+                        </div>
+                    </div>
+                    
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="loginModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Login</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <div class="alert alert-success alert-dismissible login-success">
+                        <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <strong>Success!</strong> Login successfully.
+                    </div>
+                    <div class="alert alert-danger alert-dismissible password">
+                        <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <strong>Error!</strong> Credentials not working.
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="signupModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Signup</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="name" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="pass" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="alert alert-success alert-dismissible signup-success">
+                        <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <strong>Success!</strong> User created.
+                    </div>
+                    <div class="alert alert-danger alert-dismissible signup-error">
+                        <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <strong>Error!</strong> Something went wrong.
+                    </div>
+                    <button type="submit">Signup</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+
+</body>
+<script>
+    jQuery(document).ready(function () {
+
+        // Function to show the menu
+        function showMenu() {
+            jQuery('.menu-sidebar').css('transform', 'translateX(0%)');
+        }
+
+        // Function to hide the menu
+        function hideMenu() {
+            jQuery('.menu-sidebar').css('transform', 'translateX(-300px)');
+        }
+
+        // Use a timeout to prevent flickering
+        let hideTimeout;
+
+        // When mouse enters either sidebar or menu-sidebar
+        jQuery('.sidebar, .menu-sidebar').on('mouseenter', function () {
+            clearTimeout(hideTimeout);
+            showMenu();
+        });
+
+        // When mouse leaves both, start a short timeout to hide
+        jQuery('.sidebar, .menu-sidebar').on('mouseleave', function () {
+            hideTimeout = setTimeout(hideMenu, 200); // delay to avoid flicker
+        });
+
+    });
+
+
+    // -----------------------
+
+      jQuery(document).ready(function () {
+        // Show sidebar
+        jQuery('.mobile-humberger').on('click', function () {
+            jQuery('.sidebar').addClass('active');
+        });
+
+        // Hide sidebar
+        jQuery('.close-icon').on('click', function () {
+            jQuery('.sidebar').removeClass('active');
+        });
+        
+    });
+
+</script>
+
+<script src="./assets/js/custom.js"></script>
+<script src="./assets/js/about-us.js"></script>
+</html>

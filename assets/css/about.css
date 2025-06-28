@@ -1,0 +1,157 @@
+.container-about {
+    max-width: 1280px; /* Equivalent to max-w-7xl */
+    width: 100%;
+    background-color: #fff;
+    padding: 40px; /* Equivalent to p-8 sm:p-10 */
+    border-radius: 12px; /* Equivalent to rounded-xl */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Equivalent to shadow-xl */
+    box-sizing: border-box;
+}
+
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column for mobile */
+    gap: 32px; /* Equivalent to gap-8 */
+    align-items: flex-start;
+}
+
+@media (min-width: 1024px) { /* Equivalent to lg breakpoint */
+    .grid-layout {
+        grid-template-columns: repeat(12, 1fr); /* 12 columns for larger screens */
+    }
+    .image-section {
+        grid-column: span 4 / span 4; /* Equivalent to lg:col-span-4 */
+    }
+    .content-section {
+        grid-column: span 8 / span 8; /* Equivalent to lg:col-span-8 */
+    }
+}
+
+.image-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px; /* Equivalent to p-4 */
+    background-color: #e6f0ff; /* Equivalent to bg-blue-50 */
+    border-radius: 8px; /* Equivalent to rounded-lg */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Equivalent to shadow-md */
+}
+
+.image-section img {
+    border-radius: 8px; /* Equivalent to rounded-lg */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Equivalent to shadow-lg */
+    max-width: 100%;
+    height: auto;
+}
+
+.content-section {
+    display: flex;
+    flex-direction: column;
+    color: #4b5563; /* Equivalent to text-gray-700 */
+}
+
+.content-section h1 {
+    font-size: 2.25rem; /* Equivalent to text-3xl sm:text-4xl */
+    font-weight: 800; /* Equivalent to font-extrabold */
+    color: #1e40af; /* Equivalent to text-blue-800 */
+    margin-bottom: 16px; /* Equivalent to mb-4 */
+}
+
+.content-section h2 {
+    font-size: 1.5rem; /* Equivalent to text-2xl */
+    font-weight: 700; /* Equivalent to font-bold */
+    color: #374151; /* Equivalent to text-gray-800 */
+    border-bottom: 1px solid #e5e7eb; /* Equivalent to border-b border-gray-200 */
+    padding-bottom: 8px; /* Equivalent to pb-2 */
+    margin-bottom: 16px; /* Equivalent to mb-4 */
+}
+
+.content-section p {
+    font-size: 1.125rem; /* Equivalent to text-lg */
+    line-height: 1.75; /* Equivalent to leading-relaxed */
+    margin-top: 0;
+    margin-bottom: 1.5em; /* Simulates space-y-6 */
+}
+
+.content-section ul {
+    list-style-type: disc;
+    list-style-position: inside;
+    padding-left: 0;
+    margin-top: 0;
+    margin-bottom: 1.5em; /* Simulates space-y-6 */
+}
+
+.content-section ul li {
+    font-size: 1.125rem; /* Equivalent to text-lg */
+    line-height: 1.75; /* Equivalent to leading-relaxed */
+    margin-bottom: 8px; /* Equivalent to space-y-2 */
+}
+
+.content-section strong.text-blue-700 {
+    font-weight: 600;
+    color: #1d4ed8;
+}
+
+.content-section strong.text-red-600 {
+    color: #dc2626;
+}
+
+.content-section strong.text-green-700 {
+    font-weight: 600;
+    color: #047857;
+}
+
+.content-section blockquote {
+    font-size: 1.25rem; /* Equivalent to text-xl */
+    font-style: italic;
+    font-weight: 500;
+    color: #374151; /* Equivalent to text-gray-800 */
+    border-left: 4px solid #3b82f6; /* Equivalent to border-l-4 border-blue-500 */
+    padding-left: 16px; /* Equivalent to pl-4 */
+    padding-top: 8px; /* Equivalent to py-2 */
+    padding-bottom: 8px; /* Equivalent to py-2 */
+    margin-top: 24px; /* Equivalent to mt-6 */
+    margin-bottom: 1.5em; /* Simulates space-y-6 */
+}
+
+.content-section blockquote footer {
+    margin-top: 8px; /* Equivalent to mt-2 */
+    font-size: 1rem; /* Equivalent to text-base */
+    font-style: normal;
+    color: #4b5563; /* Equivalent to text-gray-600 */
+}
+
+.content-section .final-heading {
+    font-size: 1.25rem; /* Equivalent to text-xl */
+    font-weight: 800; /* Equivalent to font-extrabold */
+    color: #1e40af; /* Equivalent to text-blue-800 */
+    margin-top: 24px; /* Equivalent to mt-6 */
+    padding-top: 16px; /* Equivalent to pt-4 */
+    border-top: 1px solid #e5e7eb; /* Equivalent to border-t border-gray-200 */
+}
+
+.content-section .final-paragraph {
+    font-size: 1.125rem; /* Equivalent to text-lg */
+    font-weight: 600; /* Equivalent to font-semibold */
+    color: #4b5563; /* Equivalent to text-gray-600 */
+    margin-bottom: 0;
+    margin-top: 0.5em;
+}
+
+/* Adjust margins for general spacing within content-section */
+.content-section > *:not(:last-child) {
+    margin-bottom: 24px; /* Adjust as needed for spacing, simulating space-y-6 */
+}
+.content-section p:last-of-type {
+    margin-bottom: 0;
+}
+.content-section h1 + p {
+    margin-top: 0;
+}
+.content-section h2 + ul,
+.content-section h2 + p {
+    margin-top: 0;
+}
+.content-section ul + p {
+        margin-top: 24px; /* Adjust for spacing after lists */
+}

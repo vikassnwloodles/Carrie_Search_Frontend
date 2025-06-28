@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrie Search</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .main-logo {
+            width: 15vw;
+        }
+
+        .logo-main .char-c { color: #8a3ffc; }
+        .logo-main .char-a { color: #f47f20; }
+        .logo-main .char-r1 { color: #4589ff; }
+        .logo-main .char-r2 { color: #fcc100; }
+        .logo-main .char-i { color: #4589ff; }
+        .logo-main .char-e { color: #34c759; }
+
+        #main-sidebar:hover + #secondary-sidebar,
+        #secondary-sidebar:hover {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        #secondary-sidebar {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+        
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #center-content-wrapper {
+            transition: all 0.5s ease-in-out;
+        }
+
+        #search-results-container {
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        #search-results-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #search-results-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        #search-results-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        #search-results-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        #model-dropdown {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 38px; /* Adjusted width */
+            height: 22px; /* Adjusted height */
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 22px; /* Adjusted border-radius */
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; /* Adjusted height */
+            width: 18px; /* Adjusted width */
+            left: 2px; /* Adjusted left */
+            bottom: 2px; /* Adjusted bottom */
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #20c997; /* Tailwind teal-500 equivalent */
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(16px); /* Adjusted translate for smaller switch */
+        }
+        
+        /* Custom height for the search input and padding to make space for icons at the bottom */
+        #ai_search {
+            min-height: 100px; /* Increased height */
+            padding-bottom: 50px; /* Create space for icons at the bottom */
+            padding-left: 20px; /* Adjusted padding for text at the top */
+            padding-right: 20px; /* Adjusted padding for text at the top */
+        }
+
+        /* Position left and right icon containers at the bottom of the input field */
+        #search-form .absolute.left-4 {
+            bottom: 8px; /* Adjust as needed for exact vertical alignment */
+            top: unset; /* Remove top positioning */
+            transform: unset; /* Remove transform */
+            left: 10px; /* Keep consistent left spacing */
+        }
+
+        #search-form .absolute.right-4 {
+            bottom: 8px; /* Adjust as needed for exact vertical alignment */
+            top: unset; /* Remove top positioning */
+            transform: unset; /* Remove transform */
+            right: 10px; /* Keep consistent right spacing */
+        }
+
+        .image-carousel-wrapper {
+            position: relative;
+            width: 100%; /* Make wrapper full width */
+            margin-top: 16px; /* Space above the carousel */
+            margin-bottom: 16px; /* Space below the carousel */
+        }
+
+        .image-carousel-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 16px; /* Space between images */
+            padding: 0 40px; /* Padding for scrollbar and space for arrows */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: #888 #f1f1f1; /* Firefox scrollbar color */
+        }
+
+        .image-carousel-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .image-carousel-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .image-carousel-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .image-carousel-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .image-card {
+            flex-shrink: 0; /* Prevent images from shrinking */
+            height: 150px; /* Fixed height for all image cards */
+            width: 250px; /* Fixed width for each card, adjust as needed */
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-card img {
+            height: 100%; /* Image fills the height of the card */
+            width: 100%; /* Image fills the width of the card */
+            object-fit: cover; /* Cover the area, cropping if necessary */
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 10;
+            transition: background-color 0.3s ease;
+        }
+
+        .carousel-arrow:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .carousel-arrow.left {
+            left: 5px;
+        }
+
+        .carousel-arrow.right {
+            right: 5px;
+        }
+
+    </style>
+</head>
+<body class="bg-[#fcfcf9]">
+
+    <div class="flex h-screen">
+        <aside id="main-sidebar" class="w-20 bg-[#f7f7f4] border-r border-gray-200 p-4 flex flex-col items-center z-20">
+            <div class="flex flex-col items-center justify-between mb-8">
+                <span class="text-2xl font-bold text-gray-700">C</span>
+            </div>
+            <nav class="flex flex-col space-y-4">
+                <a href="#home" class="w-12 h-12 flex flex-col items-center justify-center rounded-full bg-gray-200 text-gray-800" title="Home">
+                    <i class="fas fa-home text-xl"></i>
+                </a>
+                <a href="#" class="w-12 h-12 flex flex-col items-center justify-center rounded-full hover:bg-gray-200 text-gray-600" title="Discover">
+                    <i class="fas fa-compass text-xl"></i>
+                </a>
+                <a href="javascript:void(0)" class="to-home w-12 h-12 flex flex-col items-center justify-center rounded-full hover:bg-gray-200 text-gray-600" title="New Chat">
+                    <i class="fas fa-plus text-xl"></i>
+                </a>
+            </nav>
+        </aside>
+
+        <aside id="secondary-sidebar" class="absolute left-20 top-0 w-64 h-full bg-gray-100 border-r border-gray-200 p-6 z-10">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">Explore</h3>
+            <nav class="flex flex-col space-y-2">
+                <a href="#" class="p-3 rounded-lg hover:bg-gray-200 text-gray-700 font-medium">Finance</a>
+                <a href="#" class="p-3 rounded-lg hover:bg-gray-200 text-gray-700 font-medium">Travel</a>
+                <a href="#" class="p-3 rounded-lg hover:bg-gray-200 text-gray-700 font-medium">Academic</a>
+                <a href="#" id="library-link" class="p-3 rounded-lg hover:bg-gray-200 text-gray-700 font-medium">Library</a>
+            </nav>
+        </aside>
+
+        <main id="main-content-area" class="flex-1 flex flex-col">
+            <header class="flex justify-between items-center px-8 py-6">
+                <a href="#" id="about-us-link" class="text-gray-600 hover:text-black font-medium transition-colors">About Us</a>
+                <nav class="flex items-center space-x-6">
+                    <a href="#" id="how-carrie-works-link" class="text-gray-600 hover:text-black font-medium transition-colors">How Carrie Works</a>
+                    <a href="#" id="pricing-link" class="text-gray-600 hover:text-black font-medium transition-colors">Pricing</a>
+                    <a href="#" id="signup-link" class="text-gray-600 hover:text-black font-medium transition-colors">Signup</a>
+                    <a href="#" id="auth-link" class="text-gray-600 hover:text-black font-medium transition-colors">Login</a>
+                </nav>
+            </header>
+
+            <div id="app-message-container" class="w-full max-w-4xl mx-auto px-4 py-2 mt-4 text-center hidden"></div>
+
+            <div id="dynamic-content-container" class="flex-1 flex flex-col items-center w-full px-4 overflow-y-auto">
+                <div id="center-content-wrapper" class="w-full flex flex-col items-center justify-center flex-1">
+                    <img class="main-logo" src="./assets/images/carrie.png" alt="Carrie">
+
+                    <div id="search-results-container" class="w-full max-w-4xl mt-8 hidden"></div>
+
+                    <form id="search-form" class="w-full max-w-3xl pb-12">
+                         <div class="relative flex items-center">
+                            <!-- Input field fills the space -->
+                            <input 
+                                id="ai_search"
+                                type="text" 
+                                placeholder="Search, Ask, or Write Anything!" 
+                                class="w-full border border-gray-200 rounded-xl py-5 text-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition-shadow"
+                            />
+                            
+                            <!-- Left side icons -->
+                            <div class="absolute left-4 flex items-center space-x-2 z-20">
+                                <!-- Pro Mode Toggle -->
+                                <div class="relative">
+                                    <button type="button" id="pro-mode-button" class="text-gray-500 hover:text-black p-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                           <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+                                           <path d="M21 21l-6 -6"></path>
+                                        </svg>
+                                    </button>
+                                    <div id="pro-mode-dropdown" class="absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg p-3 hidden">
+                                        <label class="flex items-center justify-between cursor-pointer">
+                                            <span class="font-semibold text-gray-800">Pro Mode</span>
+                                            <span class="toggle-switch">
+                                                <input type="checkbox" id="pro-mode-toggle" class="hidden">
+                                                <span class="slider"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Deep Research Toggle -->
+                                <div class="relative">
+                                    <button type="button" id="deep-research-button" class="text-gray-500 hover:text-black p-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-atom-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                           <path d="M12 12l6.35 -3.5l-3.85 -6.7c-.82 -1.43 -2.31 -2.3 -4 -2.3h-0.98c-1.69 0 -3.18 .87 -4 2.3l-3.85 6.7l6.35 3.5"></path>
+                                           <path d="M12 12l-6.35 3.5l3.85 6.7c.82 1.43 2.31 2.3 4 2.3h.98c1.69 0 3.18 -.87 4 -2.3l3.85 -6.7l-6.35 -3.5"></path>
+                                           <path d="M12 12l0 9"></path>
+                                        </svg>
+                                    </button>
+                                    <div id="deep-research-dropdown" class="absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg p-3 hidden">
+                                        <label class="flex items-center justify-between cursor-pointer">
+                                            <span class="font-semibold text-gray-800">Deep Research</span>
+                                            <span class="toggle-switch">
+                                                <input type="checkbox" id="deep-research-toggle" class="hidden">
+                                                <span class="slider"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Labs Toggle -->
+                                <div class="relative">
+                                    <button type="button" id="labs-button" class="text-gray-500 hover:text-black p-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-flask" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                           <path d="M9 3l6 0"></path>
+                                           <path d="M10 3v10c0 1.4 .5 2.7 1.3 3.7l3.7 3.3h-8.3c-1 0 -1.9 -.5 -2.7 -1.3a3.6 3.6 0 0 1 -1.3 -2.7l0 -5.3"></path>
+                                           <path d="M10 13h4"></path>
+                                        </svg>
+                                    </button>
+                                    <div id="labs-dropdown" class="absolute left-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg p-3 hidden">
+                                        <label class="flex items-center justify-between cursor-pointer">
+                                            <span class="font-semibold text-gray-800">Labs</span>
+                                            <span class="toggle-switch">
+                                                <input type="checkbox" id="labs-toggle" class="hidden">
+                                                <span class="slider"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right side icons -->
+                            <div class="absolute right-4 flex items-center space-x-2 z-20">
+                                <!-- CPU Icon and Dropdown Trigger (Choose a Model) -->
+                                <div class="relative">
+                                    <button type="button" id="model-select-button" class="text-gray-500 hover:text-black p-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-cpu" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M5 5m-2 0a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"></path>
+                                            <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+                                            <path d="M12 9v-2"></path>
+                                            <path d="M12 15v2"></path>
+                                            <path d="M9 12h-2"></path>
+                                            <path d="M15 12h2"></path>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Model Dropdown -->
+                                    <div id="model-dropdown" class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg z-30 hidden">
+                                        <div class="p-3">
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 model-option" data-model-value="best">
+                                                <p class="font-semibold text-gray-800">Best</p>
+                                                <p class="text-sm text-gray-600">Selects the best model for each query</p>
+                                            </div>
+                                        </div>
+                                        <hr class="border-gray-200">
+                                        <div class="p-3 space-y-2">
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 model-option" data-model-value="sonar">
+                                                <p class="font-semibold text-gray-800">Sonar</p>
+                                                <p class="text-sm text-gray-600">Perplexity's fast model</p>
+                                            </div>
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 model-option" data-model-value="claude-4-sonnet">
+                                                <p class="font-semibold text-gray-800">Claude 4.0 Sonnet</p>
+                                                <p class="text-sm text-gray-600">Anthropic's advanced model</p>
+                                            </div>
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 model-option" data-model-value="gpt-4-1">
+                                                <p class="font-semibold text-gray-800">GPT-4.1</p>
+                                                <p class="text-sm text-gray-600">OpenAI's advanced model</p>
+                                            </div>
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 model-option" data-model-value="gemini-2.5-pro">
+                                                <p class="font-semibold text-gray-800">Gemini 2.5 Pro 06-05 <span class="ml-2 px-2 py-0.5 bg-teal-200 text-teal-800 text-xs font-semibold rounded-full">new</span></p>
+                                                <p class="text-sm text-gray-600">Google's latest model</p>
+                                            </div>
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 model-option" data-model-value="grok-3-beta">
+                                                <p class="font-semibold text-gray-800">Grok 3 Beta</p>
+                                                <p class="text-sm text-gray-600">xAI's latest model</p>
+                                            </div>
+                                        </div>
+                                        <hr class="border-gray-200">
+                                        <div class="p-3">
+                                            <div class="bg-gray-100 rounded-md p-2 mb-2">
+                                                <p class="font-semibold text-gray-800 inline-block bg-teal-100 px-2 py-1 rounded-md">Reasoning</p>
+                                            </div>
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 model-option" data-model-value="r1-1776">
+                                                <p class="font-semibold text-gray-800">R1 1776</p>
+                                                <p class="text-sm text-gray-600">Perplexity's unbiased reasoning model</p>
+                                            </div>
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 model-option" data-model-value="o3">
+                                                <p class="font-semibold text-gray-800">o3</p>
+                                                <p class="text-sm text-gray-600">OpenAI's reasoning model</p>
+                                            </div>
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 model-option" data-model-value="claude-4-sonnet-thinking">
+                                                <p class="font-semibold text-gray-800">Claude 4.0 Sonnet Thinking</p>
+                                                <p class="text-sm text-gray-600">Anthropic's reasoning model</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Source Selection Icon and Dropdown -->
+                                <div class="relative">
+                                    <button type="button" id="source-select-button" class="text-gray-500 hover:text-black p-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-globe" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                           <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                                           <path d="M12 18.5a2.5 2.5 0 0 0 0 -5a2.5 2.5 0 0 0 0 -5"></path>
+                                           <path d="M12 12c-2.75 -3.5 -5 -8 -8 -8"></path>
+                                           <path d="M12 12c2.75 -3.5 5 -8 8 -8"></path>
+                                           <path d="M12 12c-2.75 3.5 -5 8 -8 8"></path>
+                                           <path d="M12 12c2.75 3.5 5 8 8 8"></path>
+                                        </svg>
+                                    </button>
+                                    <!-- Source Dropdown -->
+                                    <div id="source-dropdown" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-30 hidden">
+                                        <div class="p-3 space-y-2">
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 source-option" data-source-value="web">
+                                                <p class="font-semibold text-gray-800">Web</p>
+                                                <p class="text-sm text-gray-600">Search across the entire Internet</p>
+                                            </div>
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 source-option" data-source-value="academic">
+                                                <p class="font-semibold text-gray-800">Academic</p>
+                                                <p class="text-sm text-gray-600">Search academic papers</p>
+                                            </div>
+                                            <div class="cursor-pointer hover:bg-gray-100 rounded-md p-2 source-option" data-source-value="social">
+                                                <p class="font-semibold text-gray-800">Social</p>
+                                                <p class="text-sm text-gray-600">Discussions and opinions</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Attachment Icon (moved to right side, 3rd position) -->
+                                <label for="file-upload" class="cursor-pointer">
+                                    <i class="fas fa-paperclip text-gray-500 hover:text-black text-xl p-2"></i>
+                                </label>
+                                <input id="file-upload" type="file" class="hidden"/>
+
+                                <!-- Mic Button -->
+                                <button type="button" id="mic-button" class="text-gray-500 hover:text-black p-2">
+                                    <i class="fa-solid fa-microphone-lines text-xl" id="mic-icon"></i>
+                                </button>
+                                <button type="submit" class="bg-teal-600 text-white rounded-lg w-12 h-12 flex items-center justify-center hover:bg-teal-700 transition-colors">
+                                    <i class="fas fa-arrow-right text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="loginModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 invisible z-50">
+        <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md m-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Login</h2>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
+
+            <div class="password alert hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4" role="alert">
+                <strong class="font-bold">Error!</strong>
+                <span class="block sm:inline">Invalid username or password.</span>
+            </div>
+            <div class="login-success hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative mb-4" role="alert">
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline">You have been logged in.</span>
+            </div>
+
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                    <input id="username" type="text" placeholder="Enter your username" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <input id="password" type="password" placeholder="Enter your password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+                <button type="submit" class="w-full bg-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-700 transition-colors">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        let selectedModel = "best";
+        let isProModeEnabled = false;
+        let isDeepResearchEnabled = false;
+        let isLabsEnabled = false;
+        let selectedSource = "web";
+
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+            const emailVerifyStatus = urlParams.get('status');
+            const $appMessageContainer = $('#app-message-container');
+
+            if (sessionId) {
+                localStorage.setItem('session_id', sessionId);
+                
+                $appMessageContainer.removeClass('hidden').addClass('bg-green-100 text-green-700 p-3 rounded-lg').html(`
+                    <p class="font-bold">Payment Successful!</p>
+                    <p>Your subscription has been activated. Thank you for your support!</p>
+                `);
+
+                urlParams.delete('session_id');
+                const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+                history.replaceState(null, '', newUrl);
+
+                setTimeout(() => {
+                    $appMessageContainer.addClass('hidden').removeClass('bg-green-100 text-green-700 p-3 rounded-lg').html('');
+                }, 5000);
+            }
+
+            if(emailVerifyStatus){
+
+                if(emailVerifyStatus == 'invalid'){
+                    $appMessageContainer.removeClass('hidden').addClass('bg-red-100 text-red-700 p-3 rounded-lg').html(`
+                        <p class="font-bold">Email Not Verified!</p>
+                        <p>Invalid! Email can not be verified</p>
+                    `);
+                } else if(emailVerifyStatus == 'success'){
+                    
+                    $appMessageContainer.removeClass('hidden').addClass('bg-green-100 text-green-700 p-3 rounded-lg').html(`
+                        <p class="font-bold">Email Verify Successful!</p>
+                        <p>Your email has been successfully verified. Thank you for your support!</p>
+                    `);
+                } else if(emailVerifyStatus == 'expired'){
+                    $appMessageContainer.removeClass('hidden').addClass('bg-red-100 text-red-700 p-3 rounded-lg').html(`
+                        <p class="font-bold">Email Not Verified!</p>
+                        <p>Invalid! Email verification token expired</p>
+                    `);
+                }
+
+                urlParams.delete('status');
+                const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+                history.replaceState(null, '', newUrl);
+
+                setTimeout(() => {
+                    $appMessageContainer.addClass('hidden').removeClass('bg-green-100 text-green-700 p-3 rounded-lg').html('');
+                }, 5000);
+            }
+
+        })();
+
+        const BASE_URL = "https://api.carriesearch.ai";
+
+        const pageLogoHtml = `
+            <img class="main-logo" src="./assets/images/carrie.png" alt="Carrie">
+        `;
+
+        const aboutUsContent = `
+            <div class="max-w-6xl mx-auto py-10 animate-fade-in px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                    <!-- Image Column (4 cells) -->
+                    <div class="md:col-span-4 flex justify-center">
+                        <img src="./assets/images/about-page-image.avif" alt="About Carrie Image" class="rounded-lg shadow-lg w-full h-auto max-w-sm md:max-w-full object-cover">
+                    </div>
+                    <!-- Content Column (8 cells) -->
+                    <div class="md:col-span-8 text-left">
+                        <h1 class="text-4xl font-bold text-gray-800 mb-4">Carrie Search — The Easiest Way to Search, Ask, and Write</h1>
+                        <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                            Carrie Search is your all-in-one platform for searching, asking questions, and writing anything—quickly and effortlessly. As a smarter, more intuitive alternative to Google and ChatGPT, Carrie Search is designed to make your digital life easier, more productive, and more meaningful.
+                        </p>
+                        <h2 class="text-3xl font-semibold text-gray-800 mb-3">Why Carrie Search?</h2>
+                        <ul class="list-disc list-inside text-lg text-gray-700 leading-relaxed mb-4 space-y-2">
+                            <li><strong>Effortless Searching:</strong> Find accurate answers fast, every time.</li>
+                            <li><strong>Ask Anything:</strong> Get clear, reliable responses to any question.</li>
+                            <li><strong>Write With Confidence:</strong> From emails to essays, Carrie Search helps you craft your best work.</li>
+                            <li><strong>Integrated Simplicity:</strong> Search, ask, and write in one seamless experience.</li>
+                            <li><strong>Privacy First:</strong> Your searches and questions are always safe and secure.</li>
+                        </ul>
+                        <p class="text-xl font-semibold text-teal-700 mb-4">
+                            Still using Google? Why?
+                            Carrie Search gives you more—making your life easier while making a real difference in the world.
+                        </p>
+                        <h2 class="text-3xl font-semibold text-gray-800 mb-3">Powered by Purpose</h2>
+                        <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                            Carrie Search is proudly provided by Essential Families, a Missouri nonprofit 501(c)(3).
+                            For a small monthly fee of just $9.97, you are directly funding Essential Families’ Essential Mobility Program. This program is dedicated to enabling economic mobility for unserved and underserved families in urban and rural communities across the country.
+                        </p>
+                        <h2 class="text-3xl font-semibold text-gray-800 mb-3">Your Impact</h2>
+                        <ul class="list-disc list-inside text-lg text-gray-700 leading-relaxed mb-4 space-y-2">
+                            <li>Free brand new Chromebook and 6 months of internet access for urban and rural families in need</li>
+                            <li>Digital skills training and 24/7 telehealth support</li>
+                            <li>24/7 Parenting resources, emergency assistance, and more</li>
+                            <li>Pathways to economic mobility and brighter futures</li>
+                        </ul>
+                        <p class="text-lg italic text-gray-600 leading-relaxed mb-6">
+                            Essential Families is committed to enabling economic mobility and building opportunity—one search at a time.
+                        </p>
+                        <blockquote class="border-l-4 border-teal-600 pl-4 py-2 mb-6">
+                            <p class="text-xl text-gray-800 leading-relaxed">
+                                “We’re giving unserved and underserve urban and rural children and families ACCESS to change their lives, to make them stable, then enabling them to participate in the digital economy.”
+                            </p>
+                            <footer class="text-lg font-medium text-gray-600 mt-2">— Terri English-Yancy, Founder of Essential Families</footer>
+                        </blockquote>
+                        <h2 class="text-3xl font-semibold text-gray-800 mb-3">Sign Up Today!</h2>
+                        <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                            Carrie Search isn’t just about making your life easier—it’s about creating opportunity, stability, and hope for unserved and underserved urban and rural children and families nationwide.
+                            Why settle for ordinary when you can get more, give more, and help change lives?
+                        </p>
+                        <p class="text-2xl font-bold text-teal-600 leading-relaxed mb-2">
+                            Carrie Search: Making Searching, Asking, and Writing Easier—For You and for the World
+                        </p>
+                        <p class="text-lg text-gray-700">
+                            Powered by Essential Families.
+                            Creating opportunity, stability, and economic mobility for all.
+                        </p>
+                    </div>
+                </div>
+            </div>`;
+        
+        const signupContent = `
+            <div class="max-w-3xl mx-auto py-10 animate-fade-in px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl font-bold mb-6 text-center text-gray-800">Carrie Search Client Sign Up Form</h1>
+                <p class="text-lg text-gray-700 leading-relaxed mb-4 text-center">
+                    Why settle for Google when you can get more, give more, and help change lives?
+                    Carrie Search isn’t just about making your life easier—it’s about creating opportunity, stability, and hope for unserved and underserved urban and rural children and families nationwide.
+                </p>
+                <p class="text-md text-gray-600 leading-relaxed mb-6 text-center">
+                    Please complete the following form to register for Carrie Search. All fields marked with an asterisk (*) are required.
+                </p>
+                <p class="text-md font-semibold text-teal-700 leading-relaxed mb-8 text-center">
+                    Your monthly donation of $9.97 helps fund Essential Families’ Economic Mobility Program, supporting unserved and underserved children and families in urban and rural communities across the United States.
+                    Thank you for making a difference!
+                </p>
+
+                <form id="signup-form-new" class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+                    <!-- Personal Information -->
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Personal Information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="first-name">
+                                First Name:
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="first-name" name="first_name" type="text" placeholder="John">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="last-name">
+                                Last Name:
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="last-name" name="last_name" type="text" placeholder="Doe">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="dob">
+                            Date of Birth (MM/DD/YYYY):
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="dob" name="date_of_birth" type="date">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="gender">
+                                Gender:
+                            </label>
+                            <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="gender" name="gender">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="non-binary">Non-binary</option>
+                                <option value="prefer-not-say">Prefer not to say</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="pronouns">
+                                Preferred Pronouns:
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="pronouns" name="preferred_pronouns" type="text" placeholder="e.g., She/Her, He/Him">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                            *Email Address:
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" name="email" type="email" placeholder="email@example.com" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="mobile-phone">
+                            Mobile Phone Number:
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="mobile-phone" name="mobile_phone_number" type="tel" placeholder="(123) 456-7890">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="home-address">
+                            Home Address (Street, City, State, Zip):
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="home-address" name="home_address" type="text" placeholder="123 Main St, Anytown, CA 12345">
+                    </div>
+
+                    <!-- Demographic Information -->
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Demographic Information</h2>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="race-ethnicity">
+                            Race/Ethnicity:
+                        </label>
+                        <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="race-ethnicity" name="race_ethnicity">
+                            <option value="">Select</option>
+                            <option value="american-indian">American Indian or Alaska Native</option>
+                            <option value="asian">Asian</option>
+                            <option value="black">Black or African American</option>
+                            <option value="hispanic">Hispanic or Latino</option>
+                            <option value="white">White</option>
+                            <option value="pacific-islander">Native Hawaiian or Other Pacific Islander</option>
+                            <option value="two-or-more">Two or More Races</option>
+                            <option value="other">Other</option>
+                            <option value="not-disclose">Prefer not to disclose</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="household-income">
+                            Household Income Range:
+                        </label>
+                        <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="household-income" name="household_income_range">
+                            <option value="">Select</option>
+                            <option value="0-25k">Less than $25,000</option>
+                            <option value="25k-50k">$25,000 - $49,999</option>
+                            <option value="50k-75k">$50,000 - $74,999</option>
+                            <option value="75k-100k">$75,000 - $99,999</option>
+                            <option value="100k+">$100,000 or more</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="marital-status">
+                            Marital Status:
+                        </label>
+                        <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="marital-status" name="marital_status">
+                            <option value="">Select</option>
+                            <option value="single">Single</option>
+                            <option value="married">Married</option>
+                            <option value="divorced">Divorced</option>
+                            <option value="widowed">Widowed</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="household-members">
+                            Number of People in Household:
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="household-members" name="number_of_people_in_household" type="number" min="1" placeholder="e.g., 4">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Are you currently employed?
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" class="form-radio text-teal-600" name="is_employed" value="yes">
+                                <span class="ml-2 text-gray-700">Yes</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" class="form-radio text-teal-600" name="is_employed" value="no">
+                                <span class="ml-2 text-gray-700">No</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Are you a student?
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" class="form-radio text-teal-600" name="is_student" value="yes">
+                                <span class="ml-2 text-gray-700">Yes</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" class="form-radio text-teal-600" name="is_student" value="no">
+                                <span class="ml-2 text-gray-700">No</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Do you currently have access to a computer or internet at home?
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" class="form-radio text-teal-600" name="has_computer_or_internet" value="yes">
+                                <span class="ml-2 text-gray-700">Yes</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" class="form-radio text-teal-600" name="has_computer_or_internet" value="no">
+                                <span class="ml-2 text-gray-700">No</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Account & Access -->
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Account & Access</h2>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-username">
+                            *Create a Username:
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="signup-username" name="username" type="text" placeholder="username" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-password">
+                            *Create a Password:
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="signup-password" name="password" type="password" placeholder="******************" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="confirm-password">
+                            *Confirm Password:
+                        </label>
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="confirm-password" name="confirm_password" type="password" placeholder="******************" required>
+                    </div>
+
+                    <!-- Consent and Agreement -->
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Consent and Agreement</h2>
+                    <div class="mb-4">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" class="form-checkbox text-teal-600 rounded" id="terms-agreement" required>
+                            <span class="ml-2 text-gray-700">*I agree to the Terms of Service and Privacy Policy.</span>
+                        </label>
+                    </div>
+                    <div class="mb-6">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" class="form-checkbox text-teal-600 rounded" id="communications-consent">
+                            <span class="ml-2 text-gray-700">*I consent to receive communications (email, text, and automated call) from Essential Families about my account and available services.</span>
+                        </label>
+                    </div>
+                    
+                    <p class="text-sm text-gray-600 leading-relaxed mb-6 text-center">
+                        By submitting this form, you are registering for Carrie Search and supporting Essential Families’ Essential Mobility Program, which enables economic mobility for unserved and underserved urban and rural communities across the country.
+                    </p>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-6 text-center">
+                        Your information will remain confidential and is used only to deliver the services you request and to maintain high-quality support for all clients.
+                    </p>
+
+                    <div class="flex items-center justify-center">
+                        <button class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded focus:outline-none focus:shadow-outline transition-colors" type="submit">
+                            Register for Carrie Search
+                        </button>
+                    </div>
+                </form>
+                <!-- Messages for Signup Form -->
+                <div id="signup-message" class="hidden text-center mt-4 p-3 rounded-lg"></div>
+            </div>`;
+
+            const howCarrieWorksContent = `
+            <div class="w-full py-10 animate-fade-in px-4 sm:px-6 lg:px-8">
+                <h1 class="text-4xl font-bold mb-6 text-center text-gray-800">How Carrie Works</h1>
+                <div class="max-w-4xl mx-auto mt-8">
+                    <div class="relative" style="padding-bottom: 56.25%;">
+                        <iframe class="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                            src="https://www.youtube.com/embed/X1U4wSVujgg" 
+                            title="Carrie Search: Transforming Lives One Search at a Time!" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="no-referrer" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="text-lg text-gray-700 leading-relaxed mt-8 text-center">
+                        Watch this video to understand how Carrie Search can simplify your daily tasks!
+                    </p>
+                    <ul class="list-disc list-inside text-lg text-gray-700 leading-relaxed mt-4 space-y-2">
+                        <li><strong>Seamless Searching:</strong> Get instant, relevant results from across the web.</li>
+                        <li><strong>Intelligent Answers:</strong> Ask complex questions and receive concise, accurate answers.</li>
+                        <li><strong>Effortless Writing:</strong> Generate drafts, refine content, and enhance your communication.</li>
+                        <li><strong>Integrated Experience:</strong> All your digital needs met in one intuitive platform.</li>
+                    </ul>
+                </div>
+            </div>`;
+
+            let pricingContentTemplate = `
+            <div class="max-w-xl mx-auto py-10 animate-fade-in px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl font-bold mb-6 text-gray-800">Pricing</h1>
+                <div id="pricing-status-container" class="mt-8">
+                    <p class="text-gray-600">Loading subscription status...</p>
+                </div>
+            </div>`;
+        
+        const initialCenterContent = $('#center-content-wrapper').html();
+        
+        function refreshLogstate() {
+             updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const token = localStorage.getItem('accessToken');
+            const $authLink = $('#auth-link');
+            const $signupLink = $('#signup-link');
+
+            if (token) {
+                
+                $authLink.text('Logout').off('click').on('click', function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('accessToken');
+                    updateAuthUI();
+                    resetToInitialHomeState();
+                });
+                $signupLink.hide();
+            } else {
+                
+                $authLink.text('Login').off('click').on('click', function(e) {
+                    e.preventDefault();
+                    $('#loginModal').removeClass('invisible opacity-0').addClass('visible opacity-100');
+                });
+                $signupLink.show();
+            }
+        }
+        updateAuthUI();
+
+        $('#closeModal, #loginModal').on('click', function(e) {
+            if (e.target === this || e.target.id === 'closeModal') {
+                 $('#loginModal').removeClass('visible opacity-100').addClass('invisible opacity-0');
+            }
+        });
+
+        function parseBold(text) {
+            return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
+
+        function removeFootnotes(text) {
+            return text.replace(/\s*\[\d+\](\[\d+\])*\s*$/, '').trim();
+        }
+
+        function buildTable(rows) {
+            if (rows.length < 2) {
+                return '';
+            }
+
+            var tableHtml = '<table class="min-w-full divide-y divide-gray-200 mt-4 border border-gray-200 rounded-lg overflow-hidden">';
+            var headerRow = rows[0];
+            var dataRows = rows.slice(2);
+
+            tableHtml += '<thead class="bg-gray-50"><tr>';
+            var headerCells = headerRow.substring(1, headerRow.length - 1).split('|');
+            $.each(headerCells, function(idx, cellContent) {
+                tableHtml += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">' + parseBold(removeFootnotes(cellContent)) + '</th>';
+            });
+            tableHtml += '</tr></thead>';
+
+            tableHtml += '<tbody class="bg-white divide-y divide-gray-200">';
+            $.each(dataRows, function(idx, rowStr) {
+                tableHtml += '<tr>';
+                var cells = rowStr.substring(1, rowStr.length - 1).split('|');
+                $.each(cells, function(cellIdx, cellContent) {
+                    tableHtml += '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' + parseBold(removeFootnotes(cellContent)) + '</td>';
+                });
+                tableHtml += '</tr>';
+            });
+            tableHtml += '</tbody>';
+
+            tableHtml += '</table>';
+            return tableHtml;
+        }
+
+        function structuredData(rawText){
+            var lines = rawText.split('\n');
+            var htmlBuilder = [];
+            var inList = false;
+            var inTable = false;
+            var inCodeBlock = false;
+            var currentTableLines = [];
+            var currentCodeLines = [];
+            var codeLang = '';
+
+            $.each(lines, function(i, line) {
+                var trimmedLine = line.trim();
+
+                if (trimmedLine.startsWith('```')) {
+                    if (inCodeBlock) {
+                        htmlBuilder.push('<pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto my-2"><code class="language-' + codeLang + '">' + currentCodeLines.join('\n') + '</code></pre>');
+                        currentCodeLines = [];
+                        inCodeBlock = false;
+                        codeLang = '';
+                    } else {
+                        inCodeBlock = true;
+                        codeLang = trimmedLine.substring(3).trim() || 'plaintext';
+                    }
+                    return;
+                }
+
+                if (inCodeBlock) {
+                    currentCodeLines.push(line);
+                    return;
+                }
+
+                if (!trimmedLine) {
+                    if (inList) {
+                        htmlBuilder.push('</ul>');
+                        inList = false;
+                    }
+                    if (inTable) {
+                        htmlBuilder.push(buildTable(currentTableLines));
+                        currentTableLines = [];
+                        inTable = false;
+                    }
+                    return;
+                }
+
+                if (trimmedLine.startsWith('## ')) {
+                    if (inList) {
+                        htmlBuilder.push('</ul>');
+                        inList = false;
+                    }
+                    if (inTable) {
+                        htmlBuilder.push(buildTable(currentTableLines));
+                        currentTableLines = [];
+                        inTable = false;
+                    }
+                    htmlBuilder.push('<h2 class="text-2xl font-semibold mt-4 mb-2">' + parseBold(trimmedLine.substring(3).trim()) + '</h2>');
+                } 
+                
+                else if (trimmedLine.startsWith('- ')) {
+                    if (!inList) {
+                        htmlBuilder.push('<ul class="list-disc list-inside ml-4 my-2">');
+                        inList = true;
+                    }
+                    if (inTable) {
+                        htmlBuilder.push(buildTable(currentTableLines));
+                        currentTableLines = [];
+                        inTable = false;
+                    }
+                    htmlBuilder.push('<li class="text-gray-700">' + parseBold(trimmedLine.substring(2).trim()) + '</li>');
+                } 
+                
+                else if (trimmedLine.startsWith('|') && trimmedLine.endsWith('|')) {
+                    if (inList) {
+                        htmlBuilder.push('</ul>');
+                        inList = false;
+                    }
+                    currentTableLines.push(trimmedLine);
+                    inTable = true;
+                } 
+                
+                else {
+                    if (inList) {
+                        htmlBuilder.push('</ul>');
+                        inList = false;
+                    }
+                    if (inTable) {
+                        htmlBuilder.push(buildTable(currentTableLines));
+                        currentTableLines = [];
+                        inTable = false;
+                    }
+                    htmlBuilder.push('<p class="text-gray-700 leading-relaxed my-2">' + parseBold(trimmedLine) + '</p>');
+                }
+            });
+
+            if (inList) {
+                htmlBuilder.push('</ul>');
+            }
+            if (inTable) {
+                htmlBuilder.push(buildTable(currentTableLines));
+            }
+            if (inCodeBlock && currentCodeLines.length > 0) {
+                htmlBuilder.push('<pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto my-2"><code class="language-' + codeLang + '">' + currentCodeLines.join('\n') + '</code></pre>');
+            }
+
+            return htmlBuilder.join('');
+        }
+
+        $('#login-form').on('submit', function(e) {
+            e.preventDefault();
+            const username = $('#username').val();
+            const password = $('#password').val();
+
+            var form = new FormData();
+            form.append("username", username);
+            form.append("password", password);
+
+            var settings = {
+                "url": BASE_URL + "/api/login/",
+                "method": "POST",
+                "timeout": 0,
+                "processData": false,
+                "mimeType": "multipart/form-data",
+                "contentType": false,
+                "data": form
+            };
+
+            $.ajax(settings).done(function (response) {
+                $('.login-success').removeClass('hidden').addClass('active').show();
+                $('.password.alert').addClass('hidden').removeClass('active').hide();
+                let data = JSON.parse(response);
+                localStorage.setItem('accessToken', data.access);
+                
+                refreshLogstate();
+                setTimeout(function() {
+                    $('#loginModal').removeClass('visible opacity-100').addClass('invisible opacity-0');
+                }, 1000);
+            }).fail(function (e){
+                $('.password.alert').removeClass('hidden').addClass('active').show();
+                $('.login-success').addClass('hidden').removeClass('active').hide();
+                refreshLogstate();
+            });
+        });
+
+        function loadPageContent(content) {
+            const fullContent = `<div class="w-full flex flex-col items-center justify-start pt-8">${pageLogoHtml}${content}</div>`; 
+            $('#center-content-wrapper').html(fullContent).removeClass('justify-center flex-1').addClass('justify-start');
+            $('#search-results-container').hide();
+            $('#main-logo').removeClass('text-8xl mb-10').addClass('text-4xl mb-6 hidden');
+            $('#search-form').hide();
+            $('#signup-message').removeClass('bg-green-100 bg-red-100 text-green-700 text-red-700').addClass('hidden').text('');
+        }
+
+        function resetToInitialHomeState() {
+            $('#center-content-wrapper').html(initialCenterContent).addClass('justify-center flex-1').removeClass('justify-start pt-8');
+            $('#search-results-container').empty().hide();
+            $('#main-logo').removeClass('text-4xl mb-6 hidden').addClass('text-8xl mb-10');
+            $('#search-form').show();
+            $('#ai_search').val('');
+        }
+
+        $('#about-us-link').on('click', function(e){
+            e.preventDefault();
+            loadPageContent(aboutUsContent);
+        });
+
+        $('#how-carrie-works-link').on('click', function(e){
+            e.preventDefault();
+            loadPageContent(howCarrieWorksContent);
+        });
+
+        $('#signup-link').on('click', function(e){
+            e.preventDefault();
+            loadPageContent(signupContent);
+        });
+
+        $('a[href="#home"]').on('click', function(e) {
+            e.preventDefault();
+            resetToInitialHomeState();
+        });
+
+        $('.to-home').on('click', function(e) {
+            e.preventDefault();
+            resetToInitialHomeState();
+        });
+
+        function renderSearchResults(data) {
+            let resultsHtml = `<div class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200">
+                <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">`;
+
+            data.links.forEach(link => {
+                resultsHtml += `
+                    <div class="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+                        <h3 class="font-semibold text-teal-700">${link.title}</h3>
+                        <a href="${link.url}" target="_blank" class="text-sm text-gray-500 truncate block">${link.url}</a>
+                    </div>`;
+            });
+            
+            resultsHtml += `</div>`;
+
+            if (data.images && data.images.length > 0) {
+                resultsHtml += `<h3 class="text-xl font-semibold mt-6 mb-4">Related Images:</h3>
+                                <div class="image-carousel-wrapper">
+                                    <button class="carousel-arrow left" id="image-carousel-left-arrow"><i class="fas fa-chevron-left"></i></button>
+                                    <div class="image-carousel-container" id="image-carousel-container">`;
+                data.images.forEach(image => {
+                    resultsHtml += `
+                        <a href="${image.url}" target="_blank" class="image-card">
+                            <img src="${image.src}" alt="Search result image">
+                        </a>`;
+                });
+                resultsHtml += `    </div>
+                                    <button class="carousel-arrow right" id="image-carousel-right-arrow"><i class="fas fa-chevron-right"></i></button>
+                                </div>`;
+            }
+
+            resultsHtml += `<div class="bg-white p-6 rounded-lg border border-gray-200 mb-4"><p>${data.content}</p></div></div>`;
+            
+            $('#search-results-container').prepend(resultsHtml).show();
+            $('#search-results-container').scrollTop(0);
+
+            $('#image-carousel-left-arrow').on('click', function() {
+                $('#image-carousel-container').animate({
+                    scrollLeft: $('#image-carousel-container').scrollLeft() - 750 // Scroll left by 750px
+                }, 400);
+            });
+
+            $('#image-carousel-right-arrow').on('click', function() {
+                $('#image-carousel-container').animate({
+                    scrollLeft: $('#image-carousel-container').scrollLeft() + 750 // Scroll right by 750px
+                }, 400);
+            });
+            
+        }
+
+        function searchAjax(form, token) {
+            console.log("Performing search with prompt:", form.get("prompt"));
+            var links = [];
+            var content = null;
+            var images = [];
+            
+            const loadingHtml = `<div class="animate-fade-in text-center text-gray-500 mb-8 p-6 bg-white rounded-lg border border-gray-200" id="loading-message">Searching...</div>`;
+            $('#search-results-container').prepend(loadingHtml).show();
+
+            var settings = {
+                "url": BASE_URL + "/api/search/",
+                "method": "POST",
+                "timeout": 0,
+                "headers": { "Authorization": "Bearer " + token },
+                "processData": false,
+                "mimeType": "multipart/form-data",
+                "contentType": false,
+                "data": form
+            };
+
+            $.ajax(settings).done(function (responseData) {
+                $('#loading-message').remove();
+                var response = JSON.parse(responseData);
+                
+                if (response && response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
+                    var searchContent = response.choices[0].message.content;
+                    for (let index = 0; index < response.search_results.length; index++) {
+                        const element = response.search_results[index];
+                        links.push({ title: element.title, url: element.url });
+                    }
+
+                    
+                    if( response.images ){
+                        for (let index = 0; index < response.images.length; index++) {
+                            const img = response.images[index];
+                            images.push({ src: img.image_url, url: img.origin_url });
+                        }
+                    }
+
+                    content = structuredData(searchContent);
+                    
+                    const mockResponse = {
+                        query: form.get("prompt"),
+                        links: links,
+                        images: images,
+                        content: content
+                    };
+                    renderSearchResults(mockResponse);
+
+                } else {
+                    $('#loading-message').remove();
+                    $('#search-results-container').prepend('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Search failed, please try again.</p>');
+                }
+
+            }).fail(function() {
+                $('#loading-message').remove();
+                $('#search-results-container').prepend('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Search failed, please try again.</p>');
+            });
+        }
+
+        $('#search-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            if ($('#main-logo').hasClass('text-8xl')) {
+                $('#center-content-wrapper').removeClass('justify-center flex-1').addClass('justify-start pt-8');
+                $('#main-logo').removeClass('text-8xl mb-10').addClass('text-4xl mb-6');
+            }
+            
+            const fileSelected = $('#file-upload')[0].files[0];
+            const token = localStorage.getItem('accessToken');
+            const searchQueryData = $('#ai_search').val();
+
+            if (!token) {
+                $('#search-results-container').prepend('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Please log in to perform a search.</p>').show();
+                return;
+            }
+
+            if (fileSelected) {
+                 
+                var formData = new FormData();
+                formData.append("image", fileSelected, fileSelected.name);
+
+                var settings = {
+                    "url": BASE_URL + "/api/upload-image/",
+                    "method": "POST",
+                    "timeout": 0,
+                    "headers": { "Authorization": "Bearer " + token },
+                    "processData": false,
+                    "mimeType": "multipart/form-data",
+                    "contentType": false,
+                    "data": formData
+                };
+
+                $.ajax(settings).done(function (response) {
+                    var responseData = JSON.parse(response);
+                    var form = new FormData();
+                    form.append("prompt", searchQueryData);
+                    form.append("image_url", responseData.image_url);
+                    form.append("modal", selectedModel);
+                    form.append("search_mode", selectedSource);
+                    form.append("pro", isProModeEnabled);
+                    form.append("deep_research", isDeepResearchEnabled);
+                    form.append("labs", isLabsEnabled);
+                    form.append("return_images", true);
+
+                    searchAjax(form, token);
+                    $('#file-upload').val('');
+                }).fail(function() {
+                    $('#search-results-container').prepend('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Image upload failed. Please try again.</p>');
+                });
+
+            } else {
+                
+                var form = new FormData();
+                form.append("prompt", searchQueryData);
+                form.append("modal", selectedModel);
+                form.append("search_mode", selectedSource);
+                form.append("pro", isProModeEnabled);
+                form.append("deep_research", isDeepResearchEnabled);
+                form.append("labs", isLabsEnabled);
+                form.append("return_images", true);
+
+                searchAjax(form, token);
+            }
+        });
+
+        $('#library-link').on('click', function(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                loadPageContent('<div class="max-w-4xl mx-auto text-center py-10"><h2 class="text-2xl font-bold mb-4 text-red-500">Please log in to view your Library.</h2></div>');
+                return;
+            }
+
+            loadPageContent('<div class="max-w-4xl mx-auto text-center py-10" id="library-loading"><h2 class="text-2xl font-bold mb-4">Loading Library...</h2></div>');
+
+            var form = new FormData();
+            var settings = {
+                "url": BASE_URL + "/api/library/",
+                "method": "GET",
+                "timeout": 0,
+                "headers": {
+                    "Authorization": "Bearer " + token
+                },
+                "processData": false,
+                "mimeType": "multipart/form-data",
+                "contentType": false,
+                "data": form
+            };
+
+            $.ajax(settings).done(function (response) {
+                $('#library-loading').remove();
+                renderLibraryContent(JSON.parse(response));
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                $('#library-loading').remove();
+                let errorMessage = '<div class="max-w-4xl mx-auto text-center py-10"><h2 class="text-2xl font-bold mb-4 text-red-500">Failed to load Library. Please try again later.</h2>';
+                if (jqXHR.status === 401) {
+                    errorMessage += '<p class="text-gray-600">Your session might have expired. Please log in again.</p>';
+                }
+                errorMessage += '</div>';
+                loadPageContent(errorMessage);
+            });
+        });
+
+        function renderLibraryContent(data) {
+            let libraryHtml = `<div class="max-w-4xl mx-auto text-left py-10 animate-fade-in">
+                <h1 class="text-4xl font-bold mb-8">Your Search History</h1>`;
+
+            if (data && data.length > 0) {
+                libraryHtml += `<div class="space-y-4">`;
+                
+                data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); 
+                data.forEach(item => {
+                    const searchDate = new Date(item.created_at).toLocaleString();
+                    libraryHtml += `
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                            <h3 class="font-semibold text-lg text-teal-700">${item.prompt}</h3>
+                            <p class="text-sm text-gray-500 mb-2">Searched on: ${searchDate}</p>
+                            <div class="prose max-w-none text-sm">${structuredData(item.response.choices[0].message.content || 'No detailed content available.')}</div>
+                        </div>`;
+                });
+                libraryHtml += `</div>`;
+            } else {
+                libraryHtml += `<p class="text-lg text-gray-700">No search history found.</p>`;
+            }
+            
+            libraryHtml += `</div>`;
+            loadPageContent(libraryHtml);
+        }
+
+        $(document).on('submit', '#signup-form-new', function(e) {
+            e.preventDefault();
+
+            const $form = $(this);
+            const formData = new FormData();
+
+            $form.find('input, select, textarea').each(function() {
+                const $this = $(this);
+                const name = $this.attr('name');
+                let value;
+
+                if (!name) return;
+
+                if ($this.is(':radio')) {
+                    if ($this.is(':checked')) {
+                        formData.append(name, $this.val());
+                    }
+                } else if ($this.is(':checkbox')) {
+                    formData.append(name, $this.is(':checked') ? 'true' : 'false');
+                } else {
+                    value = $this.val();
+                    formData.append(name, value);
+                }
+            });
+
+            const password = $('#signup-password').val();
+            const confirmPassword = $('#confirm-password').val();
+            const $signupMessage = $('#signup-message');
+
+            if (password !== confirmPassword) {
+                $signupMessage.removeClass('hidden bg-green-100 text-green-700').addClass('bg-red-100 text-red-700').text('Error: Passwords do not match. Please try again.');
+                return;
+            }
+            
+            $signupMessage.removeClass('bg-green-100 bg-red-100 text-green-700 text-red-700').addClass('hidden').text('');
+            $signupMessage.removeClass('hidden').addClass('bg-gray-100 text-gray-700').text('Signing up...');
+
+
+            var settings = {
+                "url": BASE_URL+'/api/signup/',
+                "method": "POST",
+                "timeout": 0,
+                "processData": false,
+                "mimeType": "multipart/form-data",
+                "contentType": false,
+                "data": formData
+            };
+
+            $.ajax(settings).done(function (response) {
+                console.log("Signup success:", response);
+                $signupMessage.removeClass('hidden bg-gray-100 text-gray-700 bg-red-100').addClass('bg-green-100 text-green-700').text('Signup successful! Please verify your email and log in with your new account.');
+                
+                $form[0].reset(); 
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.error("Signup failed:", jqXHR.responseText, textStatus, errorThrown);
+                let errorMessage = 'Signup failed. Please try again.';
+                try {
+                    const errorResponse = JSON.parse(jqXHR.responseText);
+                    if (errorResponse && errorResponse.detail) {
+                        errorMessage = errorResponse.detail;
+                    } else if (errorResponse) {
+                        
+                        const errorDetails = Object.values(errorResponse).flat().join(' ');
+                        if (errorDetails) errorMessage = errorDetails;
+                    }
+                } catch (e) {
+                    
+                }
+                $signupMessage.removeClass('hidden bg-gray-100 text-gray-700 bg-green-100').addClass('bg-red-100 text-red-700').text('Error: ' + errorMessage);
+            });
+        });
+    
+        $('#pricing-link').on('click', function(e) {
+            e.preventDefault();
+            loadPageContent(pricingContentTemplate);
+            checkSubscriptionStatus();
+        });
+
+        function checkSubscriptionStatus() {
+            const token = localStorage.getItem('accessToken');
+            const $pricingStatusContainer = $('#pricing-status-container');
+
+            if (!token) {
+                $pricingStatusContainer.html(`
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative">
+                        <p class="font-bold mb-2">Access Denied</p>
+                        <p>Please log in to view pricing and subscription details.</p>
+                    </div>
+                `);
+                return;
+            }
+
+            $pricingStatusContainer.html('<p class="text-gray-600">Checking subscription status...</p>');
+
+            var settings = {
+                "url": BASE_URL + "/api/subscription-status?session_id=cs_test_a1PDXwTaBTuJGiUR6rw0CflUs97ofL4sTIw1lfLlF1vVPucxZTZ3occOb0",
+                "method": "GET",
+                "timeout": 0,
+                "headers": {
+                    "Authorization": "Bearer " + token
+                },
+            };
+
+            $.ajax(settings).done(function (response) {
+                
+                var data = response;
+                if (data.subscription_status == 'active') {
+                    $pricingStatusContainer.html(`
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative">
+                            <p class="font-bold mb-2">Subscription Active!</p>
+                            <p>You are already subscribed to Carrie Search. Enjoy unlimited access!</p>
+                        </div>
+                    `);
+                } else {
+                    $pricingStatusContainer.html(`
+                        <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg relative">
+                            <p class="font-bold mb-2">Unlock Full Access</p>
+                            <p class="mb-4">Subscribe now for only $9.97 per month and support Essential Families' mission.</p>
+                            <button id="subscribe-button" class="bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors">
+                                Subscribe Now ($9.97/month)
+                            </button>
+                        </div>
+                    `);
+                    
+                    $('#subscribe-button').on('click', createCheckoutSession);
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                let errorMessage = 'Failed to fetch subscription status. Please try again.';
+                if (jqXHR.status === 401) {
+                    errorMessage = 'Your session might have expired. Please log in again.';
+                }
+                $pricingStatusContainer.html(`
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative">
+                        <p class="font-bold mb-2">Error</p>
+                        <p>${errorMessage}</p>
+                    </div>
+                `);
+            });
+
+        }
+
+        function createCheckoutSession() {
+            const token = localStorage.getItem('accessToken');
+            const $pricingStatusContainer = $('#pricing-status-container');
+
+            $pricingStatusContainer.html('<p class="text-gray-600">Redirecting to payment gateway...</p>');
+
+            var settings = {
+                "url": BASE_URL + "/api/create-checkout-session/",
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Authorization": "Bearer " + token
+                },
+            };
+
+            $.ajax(settings).done(function (response) {
+                
+                var data = response;
+                if (data.checkout_url) {
+                    window.location.href = data.checkout_url;
+                } else {
+                    $pricingStatusContainer.html(`
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative">
+                            <p class="font-bold mb-2">Payment Error</p>
+                            <p>Could not get payment URL. Please try again.</p>
+                        </div>
+                    `);
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                let errorMessage = 'Failed to initiate payment. Please try again.';
+                if (jqXHR.status === 401) {
+                    errorMessage = 'Your session might have expired. Please log in again.';
+                }
+                $pricingStatusContainer.html(`
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative">
+                        <p class="font-bold mb-2">Error</p>
+                        <p>${errorMessage}</p>
+                    </div>
+                `);
+            });
+        }
+        
+        const $modelSelectButton = $('#model-select-button');
+        const $modelDropdown = $('#model-dropdown');
+
+        const $proModeButton = $('#pro-mode-button');
+        const $proModeDropdown = $('#pro-mode-dropdown');
+        const $deepResearchButton = $('#deep-research-button');
+        const $deepResearchDropdown = $('#deep-research-dropdown');
+        const $labsButton = $('#labs-button');
+        const $labsDropdown = $('#labs-dropdown');
+
+        // Function to close all dropdowns
+        function closeAllDropdowns() {
+            $modelDropdown.addClass('hidden');
+            $sourceDropdown.addClass('hidden');
+            $proModeDropdown.addClass('hidden');
+            $deepResearchDropdown.addClass('hidden');
+            $labsDropdown.addClass('hidden');
+        }
+
+        $modelSelectButton.on('click', function(e) {
+            e.stopPropagation();
+            $modelDropdown.toggleClass('hidden');
+        });
+
+        $modelDropdown.on('click', '.model-option', function() {
+            selectedModel = $(this).data('model-value');
+            console.log("Selected Model:", selectedModel);
+            $modelDropdown.addClass('hidden');
+            
+        });
+
+        // --- Source Selection Dropdown Logic ---
+        const $sourceSelectButton = $('#source-select-button');
+        const $sourceDropdown = $('#source-dropdown');
+
+        // Toggle dropdown visibility for source
+        $sourceSelectButton.on('click', function(e) {
+            e.stopPropagation();
+            closeAllDropdowns(); // Close others first
+            $sourceDropdown.toggleClass('hidden');
+        });
+
+        // Handle source selection
+        $sourceDropdown.on('click', '.source-option', function() {
+            selectedSource = $(this).data('source-value');
+            console.log("Selected Source:", selectedSource);
+            // Optionally, visually indicate the selected source (e.g., add a class)
+            $('.source-option').removeClass('bg-teal-100'); // Remove highlight from previous selection
+            $(this).addClass('bg-teal-100'); // Highlight current selection
+            $sourceDropdown.addClass('hidden'); // Hide dropdown after selection
+        });
+        // Set initial highlight for default source
+        $('.source-option[data-source-value="' + selectedSource + '"]').addClass('bg-teal-100');
+
+
+        // --- Left-Side Toggle Dropdown Logic ---
+
+        $proModeButton.on('click', function(e) {
+            e.stopPropagation();
+            closeAllDropdowns();
+            $proModeDropdown.toggleClass('hidden');
+        });
+
+        $deepResearchButton.on('click', function(e) {
+            e.stopPropagation();
+            closeAllDropdowns();
+            $deepResearchDropdown.toggleClass('hidden');
+        });
+
+        $labsButton.on('click', function(e) {
+            e.stopPropagation();
+            closeAllDropdowns();
+            $labsDropdown.toggleClass('hidden');
+        });
+
+        $(document).on('click', function(e) {
+            // if (!$modelDropdown.hasClass('hidden') && !$(e.target).closest('#model-dropdown').length && !$(e.target).closest('#model-select-button').length) {
+            //     $modelDropdown.addClass('hidden');
+            // }
+
+            // Check if click is outside any dropdown or their trigger buttons
+            const isClickOutside = (dropdown, button) => 
+                !dropdown.hasClass('hidden') && 
+                !$(e.target).closest(dropdown).length && 
+                !$(e.target).closest(button).length;
+
+            if (isClickOutside($modelDropdown, $modelSelectButton)) {
+                $modelDropdown.addClass('hidden');
+            }
+            if (isClickOutside($sourceDropdown, $sourceSelectButton)) {
+                $sourceDropdown.addClass('hidden');
+            }
+            if (isClickOutside($proModeDropdown, $proModeButton)) {
+                $proModeDropdown.addClass('hidden');
+            }
+            if (isClickOutside($deepResearchDropdown, $deepResearchButton)) {
+                $deepResearchDropdown.addClass('hidden');
+            }
+            if (isClickOutside($labsDropdown, $labsButton)) {
+                $labsDropdown.addClass('hidden');
+            }
+        });
+
+        // --- Toggle Checkbox Logic ---
+        $('#pro-mode-toggle').on('change', function() {
+            isProModeEnabled = $(this).is(':checked');
+            console.log("Pro Mode Enabled:", isProModeEnabled);
+        });
+
+        $('#deep-research-toggle').on('change', function() {
+            isDeepResearchEnabled = $(this).is(':checked');
+            console.log("Deep Research Enabled:", isDeepResearchEnabled);
+        });
+
+        $('#labs-toggle').on('change', function() {
+            isLabsEnabled = $(this).is(':checked');
+            console.log("Labs Enabled:", isLabsEnabled);
+        });
+
+        const $micButton = $('#mic-button');
+        const $micIcon = $('#mic-icon');
+        const $aiSearchInput = $('#ai_search');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                console.log('Speech recognition started');
+                $micIcon.removeClass('text-gray-500').addClass('text-red-500');
+                $aiSearchInput.attr('placeholder', 'Listening...');
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                console.log('Speech recognized:', transcript);
+                $aiSearchInput.val(transcript);
+            };
+
+            recognition.onend = function() {
+                console.log('Speech recognition ended');
+                $micIcon.removeClass('text-red-500').addClass('text-gray-500');
+                $aiSearchInput.attr('placeholder', 'Search, Ask, or Write Anything!');
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                $micIcon.removeClass('text-red-500').addClass('text-gray-500');
+                $aiSearchInput.attr('placeholder', 'Speech recognition failed. Try typing.');
+            };
+
+            $micButton.on('click', function() {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('Speech recognition already in progress or not allowed:', e);
+                    
+                    $aiSearchInput.attr('placeholder', 'Microphone already active or permission denied. Please allow microphone access.');
+                    setTimeout(() => {
+                        $aiSearchInput.attr('placeholder', 'Search, Ask, or Write Anything!');
+                    }, 3000);
+                }
+            });
+        } else {            
+            console.warn('Speech Recognition API not supported in this browser.');
+            $micButton.attr('title', 'Speech recognition not supported').prop('disabled', true);
+            $micIcon.removeClass('text-gray-500').addClass('text-gray-300'); // Grey out mic icon
+        }
+
+    });
+    </script>
+</body>
+</html>
