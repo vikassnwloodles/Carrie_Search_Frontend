@@ -67,14 +67,13 @@ $(document).ready(function () {
 
     })();
 
-    const BASE_URL = "http://localhost:8000";
-    // const BASE_URL = "https://api.carriesearch.ai";
+    const BASE_URL = window.env.BASE_URL;
 
     const pageLogoHtml = `
             <img class="main-logo" src="./assets/images/carrie.png" alt="Carrie">
         `;
 
-const aboutUsContent = `
+    const aboutUsContent = `
 <div class="max-w-6xl mx-auto py-10 animate-fade-in px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
         <!-- Image Column -->
