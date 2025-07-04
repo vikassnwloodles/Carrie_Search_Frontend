@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    let selectedModel = "best";
+    let selectedModel = "sonar";
     let isProModeEnabled = false;
     let isDeepResearchEnabled = false;
     let isLabsEnabled = false;
@@ -566,6 +566,7 @@ $(document).ready(function () {
     }
 
     function structuredData(rawText) {
+        var rawText = rawText.replace(/<think>.*?<\/think>/gs, '');
         var lines = rawText.split('\n');
         var htmlBuilder = [];
         var inList = false;
@@ -843,9 +844,12 @@ $(document).ready(function () {
 
             if (response && response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
                 var searchContent = response.choices[0].message.content;
-                for (let index = 0; index < response.search_results.length; index++) {
-                    const element = response.search_results[index];
-                    links.push({ title: element.title, url: element.url });
+
+                if (response.search_results) {
+                    for (let index = 0; index < response.search_results.length; index++) {
+                        const element = response.search_results[index];
+                        links.push({ title: element.title, url: element.url });
+                    }
                 }
 
 
@@ -871,11 +875,23 @@ $(document).ready(function () {
                 $('#search-results-container').prepend('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Search failed, please try again.</p>');
             }
 
-        }).fail(function () {
+        }).fail(function (e) {
             $('#loading-message').remove();
-            $('#search-results-container').prepend('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Search failed, please try again.</p>');
+            if(e.responseText){
+                error_msg = JSON.parse(e.responseText)
+            }
+            if(error_msg.error){
+                $('#search-results-container').prepend(`<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">${error_msg.error}</p>`);
+            }
+            else{
+                $('#search-results-container').prepend('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Search failed, please try again.</p>');
+            }
         });
     }
+
+    $('#file-upload-button').click(function () {
+        $('#file-upload').click();
+    });
 
     $('#search-form').on('submit', function (e) {
         e.preventDefault();
@@ -915,7 +931,7 @@ $(document).ready(function () {
                 var form = new FormData();
                 form.append("prompt", searchQueryData);
                 form.append("image_url", responseData.image_url);
-                form.append("modal", selectedModel);
+                form.append("model", selectedModel);
                 form.append("search_mode", selectedSource);
                 form.append("pro", isProModeEnabled);
                 form.append("deep_research", isDeepResearchEnabled);
@@ -932,7 +948,7 @@ $(document).ready(function () {
 
             var form = new FormData();
             form.append("prompt", searchQueryData);
-            form.append("modal", selectedModel);
+            form.append("model", selectedModel);
             form.append("search_mode", selectedSource);
             form.append("pro", isProModeEnabled);
             form.append("deep_research", isDeepResearchEnabled);
@@ -1396,12 +1412,37 @@ $(document).ready(function () {
         $modelDropdown.toggleClass('hidden');
     });
 
-    $modelDropdown.on('click', '.model-option', function () {
-        selectedModel = $(this).data('model-value');
-        console.log("Selected Model:", selectedModel);
-        $modelDropdown.addClass('hidden');
 
+    $('#pro-mode-button').click(function () {
+        $('#model-select-container').removeClass("hidden")
+        $(this).removeClass('text-gray-500').addClass('text-blue-500')
+        $('#deep-research-button').removeClass('text-blue-500').addClass('text-gray-500')
     });
+
+    $('#deep-research-button').click(function () {
+        $('#model-select-container').addClass("hidden")
+        $(this).removeClass('text-gray-500').addClass('text-blue-500')
+        $('#pro-mode-button').removeClass('text-blue-500').addClass('text-gray-500')
+        selectedModel = "sonar-deep-research"
+    });
+
+
+
+    $modelDropdown.on('click', '.model-option', function () {
+        let $clicked = $(this);
+        selectedModel = $clicked.data('model-value');
+
+        $modelDropdown.find(".model-option").each(function () {
+            $(this).find("p").eq(0).addClass("text-gray-800");
+            $(this).find("p").eq(1).addClass("text-gray-600");
+        });
+
+        $clicked.find("p").eq(0).removeClass("text-gray-800").addClass("text-blue-500");
+        $clicked.find("p").eq(1).removeClass("text-gray-600").addClass("text-blue-500");
+
+        $modelDropdown.addClass('hidden');
+    });
+
 
     // --- Source Selection Dropdown Logic ---
     const $sourceSelectButton = $('#source-select-button');
