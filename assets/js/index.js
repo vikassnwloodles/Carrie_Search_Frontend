@@ -70,7 +70,7 @@ $(document).ready(function () {
     const BASE_URL = window.env.BASE_URL;
 
     const pageLogoHtml = `
-            <img class="main-logo" src="./assets/images/carrie.png" alt="Carrie">
+            <img class="main-logo" src="./assets/images/pete.png" alt="Pete">
         `;
 
     const aboutUsContent = `
@@ -78,35 +78,35 @@ $(document).ready(function () {
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
         <!-- Image Column -->
         <div class="md:col-span-4 flex justify-center">
-            <img src="./assets/images/about-page-image.avif" alt="About Carrie Image" class="rounded-lg shadow-lg w-full h-auto max-w-sm md:max-w-full object-cover">
+            <img src="./assets/images/about-page-image.avif" alt="About Pete Image" class="rounded-lg shadow-lg w-full h-auto max-w-sm md:max-w-full object-cover">
         </div>
         <!-- Intro Content Column -->
         <div class="md:col-span-8 text-left">
-            <h1 class="text-4xl font-bold text-gray-800 mb-4">Carrie Search — The Easiest Way to Search, Ask, and Write</h1>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Pete — The Easiest Way to Search, Ask, and Write</h1>
             <p class="text-lg text-gray-700 leading-relaxed mb-4">
-                Carrie Search is your all-in-one platform for searching, asking questions, and writing anything—quickly and effortlessly. As a smarter, more intuitive alternative to Google and ChatGPT, Carrie Search is designed to make your digital life easier, more productive, and more meaningful.
+                Pete is your all-in-one platform for searching, asking questions, and writing anything—quickly and effortlessly. As a smarter, more intuitive alternative to Google and ChatGPT, Pete is designed to make your digital life easier, more productive, and more meaningful.
             </p>
         </div>
     </div>
 
     <!-- Full-Width Content -->
     <div class="mt-12 text-left">
-        <h2 class="text-3xl font-semibold text-gray-800 mb-3">Why Carrie Search?</h2>
+        <h2 class="text-3xl font-semibold text-gray-800 mb-3">Why Pete?</h2>
         <ul class="list-disc list-inside text-lg text-gray-700 leading-relaxed mb-4 space-y-2">
             <li><strong>Effortless Searching:</strong> Find accurate answers fast, every time.</li>
             <li><strong>Ask Anything:</strong> Get clear, reliable responses to any question.</li>
-            <li><strong>Write With Confidence:</strong> From emails to essays, Carrie Search helps you craft your best work.</li>
+            <li><strong>Write With Confidence:</strong> From emails to essays, Pete helps you craft your best work.</li>
             <li><strong>Integrated Simplicity:</strong> Search, ask, and write in one seamless experience.</li>
             <li><strong>Privacy First:</strong> Your searches and questions are always safe and secure.</li>
         </ul>
         <p class="text-xl font-semibold text-teal-700 mb-4">
             Still using Google? Why?
-            Carrie Search gives you more—making your life easier while making a real difference in the world.
+            Pete gives you more—making your life easier while making a real difference in the world.
         </p>
 
         <h2 class="text-3xl font-semibold text-gray-800 mb-3">Powered by Purpose</h2>
         <p class="text-lg text-gray-700 leading-relaxed mb-4">
-            Carrie Search is proudly provided by Essential Families, a Missouri nonprofit 501(c)(3).
+            Pete is proudly provided by Essential Families, a Missouri nonprofit 501(c)(3).
             For a small monthly fee of just $9.97, you are directly funding Essential Families’ Essential Mobility Program. This program is dedicated to enabling economic mobility for unserved and underserved families in urban and rural communities across the country.
         </p>
 
@@ -130,11 +130,11 @@ $(document).ready(function () {
 
         <h2 class="text-3xl font-semibold text-gray-800 mb-3">Sign Up Today!</h2>
         <p class="text-lg text-gray-700 leading-relaxed mb-4">
-            Carrie Search isn’t just about making your life easier—it’s about creating opportunity, stability, and hope for unserved and underserved urban and rural children and families nationwide.
+            Pete isn’t just about making your life easier—it’s about creating opportunity, stability, and hope for unserved and underserved urban and rural children and families nationwide.
             Why settle for ordinary when you can get more, give more, and help change lives?
         </p>
         <p class="text-2xl font-bold text-teal-600 leading-relaxed mb-2">
-            Carrie Search: Making Searching, Asking, and Writing Easier—For You and for the World
+            Pete: Making Searching, Asking, and Writing Easier—For You and for the World
         </p>
         <p class="text-lg text-gray-700">
             Powered by Essential Families.
@@ -146,13 +146,13 @@ $(document).ready(function () {
 
     const signupContent = `
             <div class="max-w-3xl mx-auto py-10 animate-fade-in px-4 sm:px-6 lg:px-8">
-                <h1 class="text-4xl font-bold mb-6 text-center text-gray-800">Carrie Search Client Sign Up Form</h1>
+                <h1 class="text-4xl font-bold mb-6 text-center text-gray-800">Pete Client Sign Up Form</h1>
                 <p class="text-lg text-gray-700 leading-relaxed mb-4 text-center">
                     Why settle for Google when you can get more, give more, and help change lives?
-                    Carrie Search isn’t just about making your life easier—it’s about creating opportunity, stability, and hope for unserved and underserved urban and rural children and families nationwide.
+                    Pete isn’t just about making your life easier—it’s about creating opportunity, stability, and hope for unserved and underserved urban and rural children and families nationwide.
                 </p>
                 <p class="text-md text-gray-600 leading-relaxed mb-6 text-center">
-                    Please complete the following form to register for Carrie Search. All fields marked with an asterisk (*) are required.
+                    Please complete the following form to register for Pete. All fields marked with an asterisk (*) are required.
                 </p>
                 <p class="text-md font-semibold text-teal-700 leading-relaxed mb-8 text-center">
                     Your monthly donation of $9.97 helps fund Essential Families’ Economic Mobility Program, supporting unserved and underserved children and families in urban and rural communities across the United States.
@@ -354,7 +354,7 @@ $(document).ready(function () {
                     </div>
                     
                     <p class="text-sm text-gray-600 leading-relaxed mb-6 text-center">
-                        By submitting this form, you are registering for Carrie Search and supporting Essential Families’ Essential Mobility Program, which enables economic mobility for unserved and underserved urban and rural communities across the country.
+                        By submitting this form, you are registering for Pete and supporting Essential Families’ Essential Mobility Program, which enables economic mobility for unserved and underserved urban and rural communities across the country.
                     </p>
                     <p class="text-sm text-gray-600 leading-relaxed mb-6 text-center">
                         Your information will remain confidential and is used only to deliver the services you request and to maintain high-quality support for all clients.
@@ -362,7 +362,7 @@ $(document).ready(function () {
 
                     <div class="flex items-center justify-center">
                         <button class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded focus:outline-none focus:shadow-outline transition-colors" type="submit">
-                            Register for Carrie Search
+                            Register for Pete
                         </button>
                     </div>
                 </form>
@@ -372,12 +372,12 @@ $(document).ready(function () {
 
     const howCarrieWorksContent = `
             <div class="w-full py-10 animate-fade-in px-4 sm:px-6 lg:px-8">
-                <h1 class="text-4xl font-bold mb-6 text-center text-gray-800">How Carrie Works</h1>
+                <h1 class="text-4xl font-bold mb-6 text-center text-gray-800">How Pete Works</h1>
                 <div class="max-w-4xl mx-auto mt-8">
                     <div class="relative" style="padding-bottom: 56.25%;">
                         <iframe class="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
                             src="https://www.youtube.com/embed/X1U4wSVujgg" 
-                            title="Carrie Search: Transforming Lives One Search at a Time!" 
+                            title="Pete: Transforming Lives One Search at a Time!" 
                             frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             referrerpolicy="no-referrer" 
@@ -385,7 +385,7 @@ $(document).ready(function () {
                         </iframe>
                     </div>
                     <p class="text-lg text-gray-700 leading-relaxed mt-8 text-center">
-                        Watch this video to understand how Carrie Search can simplify your daily tasks!
+                        Watch this video to understand how Pete can simplify your daily tasks!
                     </p>
                     <ul class="list-disc list-inside text-lg text-gray-700 leading-relaxed mt-4 space-y-2">
                         <li><strong>Seamless Searching:</strong> Get instant, relevant results from across the web.</li>
@@ -715,7 +715,7 @@ $(document).ready(function () {
             // }, 2000);
             $('#loginModal').removeClass('visible opacity-100').addClass('invisible opacity-0');
 
-            title = "Welcome to Carrie Search!"
+            title = "Welcome to Pete!"
             message = "You're now logged in. Start exploring the smartest way to search."
             showToast({ title, message, type: "success" })
 
@@ -1314,7 +1314,7 @@ $(document).ready(function () {
                 $pricingStatusContainer.html(`
                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative">
                             <p class="font-bold mb-2">Subscription Active!</p>
-                            <p>You are already subscribed to Carrie Search. Enjoy unlimited access!</p>
+                            <p>You are already subscribed to Pete. Enjoy unlimited access!</p>
                         </div>
                     `);
             } else {
