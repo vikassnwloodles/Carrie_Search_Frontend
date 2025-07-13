@@ -5,7 +5,7 @@
 // }
 import "../utils.js"
 
-window.renderLogout = function () {
+window.handleRenderLogout = function () {
     localStorage.removeItem('accessToken');
     updateAuthUI()
 }

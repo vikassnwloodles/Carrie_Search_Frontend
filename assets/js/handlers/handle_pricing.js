@@ -110,7 +110,7 @@ function createCheckoutSession() {
 }
 
 
-window.renderPricing = function () {
+window.handleRenderPricing = function () {
     loadPageContent({html_content: pricingContent})
     checkSubscriptionStatus()
 }

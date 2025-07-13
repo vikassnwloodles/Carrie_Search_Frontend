@@ -1,26 +1,6 @@
 import "../utils.js"
 
 
-setupModalWithOutsideClose('loginModal', 'closeModal', '.password.alert', hideLoginModal);
-
-
-function updateHeaderAfterLogin() {
-    $("#login-link").addClass("hidden")
-    $("#signup-link").addClass("hidden")
-    $("#logout-link").removeClass("hidden")
-}
-
-
-function updateSidebarAfterLogin() {
-    $('#user-profile-section').show()
-}
-
-function updateUIAfterLogin() {
-    updateHeaderAfterLogin()
-    updateSidebarAfterLogin()
-    renderHome()
-}
-
 function showErrorOnLoginFail() {
     $('.password.alert').removeClass('hidden').addClass('shake');
     setTimeout(() => {
@@ -28,16 +8,17 @@ function showErrorOnLoginFail() {
     }, 300);
 }
 
-
-function resetLoginModal() {
+function hideErrorOnModalClose() {
     $('.password.alert').addClass('hidden').removeClass('shake');
+    $('.password.alert').html($('.password.alert').data("original-html"))
 }
 
-
-function hideLoginModal() {
+window.resetAndHideLoginModal = function () {
     $('#loginModal').addClass('invisible opacity-0').removeClass('visible opacity-100');
-    resetLoginModal()
+    hideErrorOnModalClose()
 }
+
+setupModalWithOutsideClose('loginModal', 'closeModal', resetAndHideLoginModal);
 
 
 function updateLoginModalUI() {
@@ -79,23 +60,29 @@ $('#login-form').on('submit', function (e) {
     };
 
     $.ajax(settings).done(function (response) {
-
         let data = JSON.parse(response);
         localStorage.setItem('accessToken', data.access);
 
-        hideLoginModal()
-        // updateUIAfterLogin()
+        resetAndHideLoginModal()
         updateAuthUI()
-
-        let title = "Welcome to Pete!"
-        let message = "You're now logged in. Start exploring the smartest way to search."
-        showToast({ title, message, type: "success" })
+        const toastOptions = [{
+            title: "Welcome to Pete!",
+            message: "You're now logged in. Start exploring the smartest way to search.",
+            type: "success"
+        }]
+        showToast({ toastOptions })
 
     }).fail(function (jqXHR, textStatus, errorThrown) {
         if (jqXHR.status === 401) showErrorOnLoginFail({ error_context: jqXHR })
-        else{
-            hideLoginModal()
-            showErrorToast({ response: jqXHR })
+        else {
+            resetAndHideLoginModal()
+            const toastOptions = [{
+                status_code: 403,
+                title: JSON.parse(jqXHR.responseText).error,
+                message: "Please verify your email to continue.",
+                type: "info"
+            }]
+            showToast({ response: jqXHR, toastOptions })
         }
     }).always(function () {
         // do something regardless of success/failure
@@ -104,17 +91,11 @@ $('#login-form').on('submit', function (e) {
 });
 
 
-function showLoginModal() {
+window.showLoginModal = function () {
     $('#loginModal').removeClass('invisible opacity-0').addClass('visible opacity-100');
     document.getElementById("login-form").classList.remove("hidden"); // Show login form
     document.getElementById("forgot-form").classList.add("hidden");   // Hide forgot form
     document.getElementById("modalTitle").textContent = "Login";      // Set modal title
-    $('#forgot-form')[0].reset();
-    $('#login-form')[0].reset();
-    $('.login-success').addClass('hidden')
+    $('.password.alert').addClass('hidden')
 }
 
-
-window.renderLogin = function () {
-    showLoginModal()
-}

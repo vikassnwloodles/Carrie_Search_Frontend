@@ -40,7 +40,7 @@ function renderLibraryContent(data) {
 }
 
 
-window.renderLibrary = function () {
+window.handleRenderLibrary = function () {
     const token = localStorage.getItem('accessToken');
 
     if (!token) {

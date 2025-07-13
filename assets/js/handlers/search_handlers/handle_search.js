@@ -1,3 +1,6 @@
+import "../../html_content/search_toast_box.js"
+
+
 window.bindSearchHandler = function () {
 
     let selectedModel = "sonar";
@@ -64,13 +67,16 @@ window.bindSearchHandler = function () {
 
 
     function searchAjax(form, token) {
-        console.log("Performing search with prompt:", form.get("prompt"));
         var links = [];
         var content = null;
         var images = [];
 
-        const loadingHtml = `<div class="animate-fade-in text-center text-gray-500 p-6 bg-white rounded-lg border border-gray-200" id="loading-message">Searching...</div>`;
+        // const loadingHtml = `<div class="animate-fade-in text-center text-gray-500 p-6 bg-white rounded-lg border border-gray-200" id="loading-message">Searching...</div>`;
 
+        const $searchToastBox = $(searchToastBox.trim());
+        $searchToastBox.attr("id", "loading-message").text("Searching...")
+        $searchToastBox.addClass("animate-fade-in text-gray-500").removeClass("text-red-500 mb-8")
+        const loadingHtml = $searchToastBox.prop("outerHTML");
         $('#search-results-container').append(loadingHtml).show();
 
         var settings = {
@@ -118,26 +124,37 @@ window.bindSearchHandler = function () {
 
             } else {
                 $('#loading-message').remove();
-                $('#search-results-container').append('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Search failed, please try again.</p>');
+                const $searchToastBox = $(searchToastBox.trim());
+                $searchToastBox.text("Search failed, please try again.")
+                $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
             }
+
+            $('#search-results-container').css('margin-bottom', "150px");
 
         }).fail(function (e) {
             $('#loading-message').remove();
             if (e.responseText) {
                 var error_msg = JSON.parse(e.responseText)
             }
-            if (error_msg.error) {
-                $('#search-results-container').append(`<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">${error_msg.error}</p>`);
-                showErrorToast({ title: "", res: e, message: error_msg.error })
-                loadPageContent(pricingContentTemplate);
-                checkSubscriptionStatus();
+            if (error_msg?.error) {
+                const toastOptions = [{
+                    status_code: 402,
+                    title: "Subscription Required",
+                    message: "You’ve reached your free usage cap. Subscribe to continue searching.",
+                    type: "info"
+                }]
+
+                showToast({ response: e, toastOptions })
+                renderPricing()
             }
             else {
-                $('#search-results-container').append('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Search failed, please try again.</p>');
+                const $searchToastBox = $(searchToastBox.trim());
+                $searchToastBox.text("Search failed, please try again.")
+                $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
             }
         }).always(function () {
             // ✅ runs on both success and failure
-            $('#search-results-container').css('margin-bottom', "150px");
+            // $('#search-results-container').css('margin-bottom', "150px");
         });
     }
 
@@ -165,27 +182,28 @@ window.bindSearchHandler = function () {
             return
         }
         else {
+            hideUploadedFileMetadataBox()
             $("#ai_search").val("").blur()
             $("#ai_search").focus()  // Using blur and focus to hide Chrome's autocomplete popup that stays at the old position when the search box is moved to the bottom
             $(".main-logo").addClass("hidden")
             $("#footer").addClass("hidden")
             $("#search-form").css({ "position": "fixed", "bottom": "-20px" })
             const dynamicHeight = $('#dynamic-content-container').height(); // or .height()
-            const headerHeight = $('#header').outerHeight(); // or .height()
-            $('#search-results-container').css('margin-bottom', dynamicHeight - headerHeight - 32 + 'px');
+            const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim())
+            $('#search-results-container').css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');
             $('#dynamic-content-container').animate({
                 scrollTop: $('#dynamic-content-container')[0].scrollHeight
             }, 500); // 500ms animation
         }
 
         if (!token) {
-            $('#search-results-container').append('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Please log in to perform a search.</p>').show();
-            // $('#search-results-container').append('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Please log in to perform a search.</p>').show();
+            const $searchToastBox = $(searchToastBox.trim());
+            $searchToastBox.text("Please log in to perform a search.")
+            $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
             return;
         }
 
         if (fileSelected) {
-            alert("file selected")
             const isImage = fileSelected.type.startsWith("image/");
             const fieldName = isImage ? "image" : "file";
             const url = window.env.BASE_URL + (isImage ? "/api/upload-image/" : "/api/upload-doc/");
@@ -208,7 +226,6 @@ window.bindSearchHandler = function () {
                 var responseData = JSON.parse(response);
                 var form = new FormData();
                 const prompt = (responseData.text_content ? `${responseData.text_content}\n\n\n${searchQueryData}` : searchQueryData)
-                console.log(prompt)
                 form.append("prompt", prompt);
                 form.append("image_url", responseData.image_url);
                 form.append("model", selectedModel);
@@ -221,7 +238,9 @@ window.bindSearchHandler = function () {
                 searchAjax(form, token);
                 $('#file-upload').val('');
             }).fail(function () {
-                $('#search-results-container').append('<p class="text-center text-red-500 mb-8 p-6 bg-white rounded-lg border border-gray-200">Image upload failed. Please try again.</p>');
+                const $searchToastBox = $(searchToastBox.trim());
+                $searchToastBox.text("Image upload failed. Please try again.")
+                $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
             });
 
         } else {
@@ -237,5 +256,142 @@ window.bindSearchHandler = function () {
 
             searchAjax(form, token);
         }
+    });
+
+
+
+
+
+
+
+    // ################### DROPDOWNS ###################
+    const $sourceDropdown = $('#source-dropdown');
+    const $proModeDropdown = $('#pro-mode-dropdown');
+    const $deepResearchDropdown = $('#deep-research-dropdown');
+    const $labsDropdown = $('#labs-dropdown');
+    const $modelDropdown = $('#model-dropdown');
+
+    const dropdownList = [
+        $sourceDropdown,
+        $proModeDropdown,
+        $deepResearchDropdown,
+        $labsDropdown,
+        $modelDropdown
+    ]
+
+    // Function to close all dropdowns
+    function closeAllDropdowns({ skipDropdown }) {
+        // $modelDropdown.addClass('hidden');
+        // $sourceDropdown.addClass('hidden');
+        // $proModeDropdown.addClass('hidden');
+        // $deepResearchDropdown.addClass('hidden');
+        // $labsDropdown.addClass('hidden');
+        dropdownList.forEach(dropdown => {
+            if (dropdown !== skipDropdown) dropdown.addClass("hidden")
+        })
+    }
+
+
+    // --- Source Selection Dropdown Logic ---
+    const $sourceSelectButton = $('#source-select-button');
+
+    const $proModeButton = $('#pro-mode-button');
+
+    const $deepResearchButton = $('#deep-research-button');
+
+    const $labsButton = $('#labs-button');
+
+    const $managePlan = $('#manage-plan');
+
+    const $modelSelectButton = $('#model-select-button');
+
+
+    // Toggle dropdown visibility for source
+    $sourceSelectButton.on('click', function (e) {
+        e.stopPropagation();
+        closeAllDropdowns({ skipDropdown: $sourceDropdown }); // Close others first
+        $sourceDropdown.toggleClass('hidden');
+    });
+
+
+    $(document).on('click', function (e) {
+        // if (!$modelDropdown.hasClass('hidden') && !$(e.target).closest('#model-dropdown').length && !$(e.target).closest('#model-select-button').length) {
+        //     $modelDropdown.addClass('hidden');
+        // }
+
+        // Check if click is outside any dropdown or their trigger buttons
+        const isClickOutside = (dropdown, button) =>
+            !dropdown.hasClass('hidden') &&
+            !$(e.target).closest(dropdown).length &&
+            !$(e.target).closest(button).length;
+
+        if (isClickOutside($modelDropdown, $modelSelectButton)) {
+            $modelDropdown.addClass('hidden');
+        }
+        if (isClickOutside($sourceDropdown, $sourceSelectButton)) {
+            $sourceDropdown.addClass('hidden');
+        }
+        if (isClickOutside($proModeDropdown, $proModeButton)) {
+            $proModeDropdown.addClass('hidden');
+        }
+        if (isClickOutside($deepResearchDropdown, $deepResearchButton)) {
+            $deepResearchDropdown.addClass('hidden');
+        }
+        if (isClickOutside($labsDropdown, $labsButton)) {
+            $labsDropdown.addClass('hidden');
+        }
+    });
+
+    function showContextMenuAbove(elementSelector) {
+        const target = $(elementSelector);
+        const offset = target.offset();
+        const menu = $("#model-dropdown");
+
+        const menuHeight = menu.outerHeight();
+        const menuWidth = menu.outerWidth();
+
+        menu.css({
+            position: "fixed",
+            top: offset.top - menuHeight - 8 + "px",
+            left: offset.left - menuWidth + 32 + "px"
+        }).removeClass("hidden");
+    }
+
+    $("#model-select-button").on("click", function () {
+        showContextMenuAbove("#model-select-button");
+    });
+
+    // $(document).on('click', '#model-select-button', function (e) {
+    //     e.stopPropagation();
+    //     // const $modelDropdown = $('#model-dropdown'); // ✅ fresh reference
+    //     $modelDropdown.toggleClass('hidden');
+    //     closeAllDropdowns({skipDropdown: $modelDropdown})
+    // });
+
+    // Handle source selection
+    $sourceDropdown.on('click', '.source-option', function () {
+        selectedSource = $(this).data('source-value');
+        // Optionally, visually indicate the selected source (e.g., add a class)
+        $('.source-option').removeClass('bg-teal-100'); // Remove highlight from previous selection
+        $(this).addClass('bg-teal-100'); // Highlight current selection
+        $sourceDropdown.addClass('hidden'); // Hide dropdown after selection
+    });
+    // Set initial highlight for default source
+    $('.source-option[data-source-value="' + selectedSource + '"]').addClass('bg-teal-100');
+
+
+    $modelDropdown.on('click', '.model-option', function () {
+        let $clicked = $(this);
+        selectedModel = $clicked.data('model-value');
+
+        $modelDropdown.find(".model-option").each(function () {
+            $(this).find("p").eq(0).addClass("text-gray-800");
+            $(this).find("p").eq(1).addClass("text-gray-600");
+        });
+
+        $clicked.find("p").eq(0).removeClass("text-gray-800").addClass("text-blue-500");
+        $clicked.find("p").eq(1).removeClass("text-gray-600").addClass("text-blue-500");
+
+        $modelDropdown.addClass('hidden');
     });
 }
