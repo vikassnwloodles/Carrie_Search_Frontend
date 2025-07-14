@@ -10,3 +10,10 @@ Once received, log in to the Stripe portal and replace all occurrences of **"Car
 ### 🔧 Task 2: Ask Riza for support@ask-pete.ai email credentials
 
 Ask Riza to send support@ask-pete.ai email credentials in order to setup them in the backend code for sending emails to Pete users using that email address.
+
+---
+
+### 🔧 Task 3: Go to Godaddy and add api.ask-pete.ai subdomain
+
+Go to Godaddy and add api.ask-pete.ai subdomain and then map it with backend by updating nginx config.  
+Also update redirect url for api.ask-pete.ai in nginx config, it should redirect to https://ask-pete.ai.
