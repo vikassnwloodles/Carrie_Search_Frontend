@@ -292,7 +292,8 @@ $(document).ready(function () {
             //     $('#app-message-container').addClass('hidden').removeClass('bg-red-100 text-red-700 p-3 rounded-lg').html('');
             // }, 5000);
 
-
+        }).always(function () {
+            // do something regardless of success/failure
             setTimeout(() => {
                 $('#dropdown-menu')[0].dispatchEvent(new CustomEvent('unset-loading', { bubbles: true }));
             }, 300);
