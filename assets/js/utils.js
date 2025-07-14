@@ -231,10 +231,10 @@ function showBaseToast({ title, message, type, duration = 5000, text_center = tr
 window.showToast = function ({ response, toastOptions, duration = 5000 }) {
     const status = response?.status;
     if (toastOptions) {
-        const toastData = toastOptions.find(toastData => toastData.status_code === status);
+        const toastData = toastOptions.find(option => option.status_code === status);
         if (toastData) {
             if (toastData.title === undefined) toastData.title = (toastData.type === "success" ? "Success!" : "Something went wrong!")
-            showBaseToast(toastData);
+                showBaseToast(toastData);
             return;
         }
     }

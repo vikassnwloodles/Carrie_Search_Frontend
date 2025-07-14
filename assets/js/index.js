@@ -10,6 +10,7 @@ import "./routes/forgot_password_route.js"
 
 import "./handlers/handle_change_password.js"
 import "./handlers/handle_user_profile.js"
+import "./handlers/search_handlers/handle_search.js"
 
 import "./utils.js"
 
@@ -248,10 +249,10 @@ $(document).ready(function () {
         e.preventDefault();
         const token = localStorage.getItem('accessToken');
 
-        if (!token) {
-            loadPageContent('<div class="max-w-4xl mx-auto text-center py-10"><h2 class="text-2xl font-bold mb-4 text-red-500">Please log in to view your Library.</h2></div>');
-            return;
-        }
+        // if (!token) {
+        //     loadPageContent('<div class="max-w-4xl mx-auto text-center py-10"><h2 class="text-2xl font-bold mb-4 text-red-500">Please log in to view your Library.</h2></div>');
+        //     return;
+        // }
 
         var form = new FormData();
         var settings = {
@@ -271,16 +272,25 @@ $(document).ready(function () {
             response = JSON.parse(response)
             window.location.href = response.url;
         }).fail(function (jqXHR, textStatus, errorThrown) {
-            let errorMessage = '<p class="font-bold">Error fetching data</p><p>Could not fetch Stripe Customer Portal URL. Please try again.</p>';
-            if (jqXHR.status === 401) {
-                errorMessage += '<p>Your session might have expired. Please log in again.</p>';
-            }
-            $('#app-message-container').removeClass('hidden').addClass('bg-red-100 text-red-700 p-3 rounded-lg').html(`
-                ${errorMessage}
-                `);
-            setTimeout(() => {
-                $('#app-message-container').addClass('hidden').removeClass('bg-green-100 text-green-700 p-3 rounded-lg').html('');
-            }, 5000);
+            const toastOptions = [{
+                status_code: 400,
+                title: "Error fetching data",
+                message: "Could not fetch Stripe Customer Portal URL. Please try again.",
+                type: "error"
+            }]
+
+            showToast({ response: jqXHR, toastOptions })
+
+            // let errorMessage = '<p class="font-bold">Error fetching data</p><p>Could not fetch Stripe Customer Portal URL. Please try again.</p>';
+            // if (jqXHR.status === 401) {
+            //     errorMessage += '<p>Your session might have expired. Please log in again.</p>';
+            // }
+            // $('#app-message-container').removeClass('hidden').addClass('bg-red-100 text-red-700 p-3 rounded-lg').html(`
+            //     ${errorMessage}
+            //     `);
+            // setTimeout(() => {
+            //     $('#app-message-container').addClass('hidden').removeClass('bg-red-100 text-red-700 p-3 rounded-lg').html('');
+            // }, 5000);
 
 
             setTimeout(() => {

@@ -280,7 +280,7 @@ window.bindSearchHandler = function () {
     ]
 
     // Function to close all dropdowns
-    function closeAllDropdowns({ skipDropdown }) {
+    window.closeAllDropdowns = function ({ skipDropdown } = {}) {
         // $modelDropdown.addClass('hidden');
         // $sourceDropdown.addClass('hidden');
         // $proModeDropdown.addClass('hidden');
@@ -308,8 +308,8 @@ window.bindSearchHandler = function () {
 
     // Toggle dropdown visibility for source
     $sourceSelectButton.on('click', function (e) {
-        e.stopPropagation();
-        closeAllDropdowns({ skipDropdown: $sourceDropdown }); // Close others first
+        // e.stopPropagation();
+        // closeAllDropdowns({ skipDropdown: $sourceDropdown }); // Close others first
         $sourceDropdown.toggleClass('hidden');
     });
 
@@ -342,10 +342,9 @@ window.bindSearchHandler = function () {
         }
     });
 
-    function showContextMenuAbove(elementSelector) {
-        const target = $(elementSelector);
+    function showContextMenuAbove(target) {
         const offset = target.offset();
-        const menu = $("#model-dropdown");
+        const menu = $modelDropdown;
 
         const menuHeight = menu.outerHeight();
         const menuWidth = menu.outerWidth();
@@ -354,11 +353,12 @@ window.bindSearchHandler = function () {
             position: "fixed",
             top: offset.top - menuHeight - 8 + "px",
             left: offset.left - menuWidth + 32 + "px"
-        }).removeClass("hidden");
+        })
     }
 
-    $("#model-select-button").on("click", function () {
-        showContextMenuAbove("#model-select-button");
+    $modelSelectButton.on("click", function () {
+        showContextMenuAbove($(this));
+        $modelDropdown.toggleClass('hidden');
     });
 
     // $(document).on('click', '#model-select-button', function (e) {
