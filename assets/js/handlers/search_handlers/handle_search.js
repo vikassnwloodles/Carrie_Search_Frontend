@@ -74,7 +74,7 @@ window.bindSearchHandler = function () {
         // const loadingHtml = `<div class="animate-fade-in text-center text-gray-500 p-6 bg-white rounded-lg border border-gray-200" id="loading-message">Searching...</div>`;
 
         const $searchToastBox = $(searchToastBox.trim());
-        $searchToastBox.attr("id", "loading-message").text("Searching...")
+        $searchToastBox.attr("id", "loading-message").text("Please standby, Pete is working to make your life and work easier...!")
         $searchToastBox.addClass("animate-fade-in text-gray-500").removeClass("text-red-500 mb-8")
         const loadingHtml = $searchToastBox.prop("outerHTML");
         $('#search-results-container').append(loadingHtml).show();
