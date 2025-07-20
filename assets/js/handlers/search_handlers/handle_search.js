@@ -10,6 +10,21 @@ window.bindSearchHandler = function () {
     let selectedSource = "web";
 
 
+    $('#pro-mode-button').click(function () {
+        alert("hi")
+        $('#model-select-container').removeClass("hidden")
+        $(this).removeClass('text-gray-500').addClass('text-blue-500')
+        $('#deep-research-button').removeClass('text-blue-500').addClass('text-gray-500')
+    });
+
+    $('#deep-research-button').click(function () {
+        $('#model-select-container').addClass("hidden")
+        $(this).removeClass('text-gray-500').addClass('text-blue-500')
+        $('#pro-mode-button').removeClass('text-blue-500').addClass('text-gray-500')
+        selectedModel = "sonar-deep-research"
+    });
+
+
     function renderSearchResults(data) {
         let resultsHtml = `<div class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200">
                 <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2>
@@ -188,6 +203,7 @@ window.bindSearchHandler = function () {
             $(".main-logo").addClass("hidden")
             $("#footer").addClass("hidden")
             $("#search-form").css({ "position": "fixed", "bottom": "-20px" })
+            $("#ai_search").attr("placeholder", "Inquire Further, Ask Another Question")
             const dynamicHeight = $('#dynamic-content-container').height(); // or .height()
             const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim())
             $('#search-results-container').css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');

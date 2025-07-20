@@ -219,22 +219,6 @@ $(document).ready(function () {
     // });
 
 
-
-
-    $('#pro-mode-button').click(function () {
-        $('#model-select-container').removeClass("hidden")
-        $(this).removeClass('text-gray-500').addClass('text-blue-500')
-        $('#deep-research-button').removeClass('text-blue-500').addClass('text-gray-500')
-    });
-
-    $('#deep-research-button').click(function () {
-        $('#model-select-container').addClass("hidden")
-        $(this).removeClass('text-gray-500').addClass('text-blue-500')
-        $('#pro-mode-button').removeClass('text-blue-500').addClass('text-gray-500')
-        selectedModel = "sonar-deep-research"
-    });
-
-
     // --- Left-Side Toggle Dropdown Logic ---
 
     $labsButton.on('click', function (e) {

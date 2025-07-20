@@ -42,9 +42,9 @@ function checkSubscriptionStatus() {
             $pricingStatusContainer.html(`
                         <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg relative">
                             <p class="font-bold mb-2">Unlock Full Access</p>
-                            <p class="mb-4">Subscribe now for only $9.97 per month and support Essential Families' mission.</p>
+                            <p class="mb-4">Subscribe now for only $15 per month and support Essential Families' mission.</p>
                             <button id="subscribe-button" class="bg-teal-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors">
-                                Subscribe Now ($9.97/month)
+                                Subscribe Now ($15/month)
                             </button>
                         </div>
                     `);

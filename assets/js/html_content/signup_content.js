@@ -9,7 +9,7 @@ window.signupContent = `
         Please complete the following form to register for Pete. All fields marked with an asterisk (*) are required.
     </p>
     <p class="text-md font-semibold text-teal-700 leading-relaxed mb-8 text-center">
-        Your monthly donation of $9.97 helps fund Essential Families’ Economic Mobility Program, supporting unserved and underserved children and families in urban and rural communities across the United States.
+        Your monthly donation of $15 helps fund Essential Families’ Economic Mobility Program, supporting unserved and underserved children and families in urban and rural communities across the United States.
         Thank you for making a difference!
     </p>
 
@@ -49,12 +49,12 @@ window.signupContent = `
                     <option value="prefer-not-say">Prefer not to say</option>
                 </select>
             </div>
-            <div>
+            <!-- <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="pronouns">
                     Preferred Pronouns:
                 </label>
                 <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="pronouns" name="preferred_pronouns" type="text" placeholder="e.g., She/Her, He/Him">
-            </div>
+            </div> -->
         </div>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
@@ -76,7 +76,7 @@ window.signupContent = `
         </div>
 
         <!-- Demographic Information -->
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Demographic Information</h2>
+        <!-- <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Demographic Information</h2>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="race-ethnicity">
                 Race/Ethnicity:
@@ -169,7 +169,7 @@ window.signupContent = `
                     <span class="ml-2 text-gray-700">No</span>
                 </label>
             </div>
-        </div>
+        </div> -->
 
         <!-- Account & Access -->
         <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Account & Access</h2>

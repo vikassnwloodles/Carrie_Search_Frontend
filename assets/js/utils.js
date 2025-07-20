@@ -16,7 +16,8 @@ window.reset_password_token = urlParams.get('token');
 window.loadPageContent = function ({ html_content, is_homepage = false }) {
     html_content = `${headerLogo}${html_content}`
     if (is_homepage) {
-        $('#center-content-wrapper').html(html_content).addClass('justify-center flex-1').removeClass('justify-start');
+        // $('#center-content-wrapper').html(html_content).addClass('justify-center flex-1').removeClass('justify-start');
+        $('#center-content-wrapper').html(html_content).addClass('mt-24 flex-1').removeClass('justify-start');
         $(".main-logo").css({ "margin-bottom": "20px" })
     }
     else {

@@ -4,7 +4,7 @@ window.howCarrieWorksContent = `
     <div class="max-w-4xl mx-auto mt-8">
         <div class="relative" style="padding-bottom: 56.25%;">
             <iframe class="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
-                src="https://www.youtube.com/embed/X1U4wSVujgg" 
+                src="https://www.youtube.com/embed/ERDugq1F5QU?si=G83GkELnd8TpZcVY" 
                 title="Pete: Transforming Lives One Search at a Time!" 
                 frameborder="0" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 

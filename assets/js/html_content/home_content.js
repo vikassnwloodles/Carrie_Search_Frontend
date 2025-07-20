@@ -74,7 +74,7 @@ window.home_content = `
 
 
         <div class="absolute right-4 flex items-center space-x-1 sm:space-x-2">
-            <div class="relative" id="model-select-container">
+            <!-- <div class="relative" id="model-select-container">
                 <button type="button" id="model-select-button" class="text-gray-500 hover:text-black p-1 sm:p-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="1.7999999999999998" stroke-linecap="round"
@@ -136,7 +136,7 @@ window.home_content = `
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <div class="relative">
                 <button type="button" id="source-select-button" class="text-gray-500 hover:text-black p-1 sm:p-2">
