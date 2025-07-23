@@ -17,7 +17,30 @@ window.loadPageContent = function ({ html_content, is_homepage = false }) {
     html_content = `${headerLogo}${html_content}`
     if (is_homepage) {
         // $('#center-content-wrapper').html(html_content).addClass('justify-center flex-1').removeClass('justify-start');
-        $('#center-content-wrapper').html(html_content).addClass('mt-24 flex-1').removeClass('justify-start');
+        // $('#center-content-wrapper').html(html_content).addClass('flex-1').removeClass('justify-start');
+
+        // $('#center-content-wrapper').html(html_content).addClass('mt-24 flex-1').removeClass('justify-start');
+
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
+        if (isMobile) {
+            // For phones
+            // console.log("here mobile")
+            $('#center-content-wrapper')
+                .html(html_content)
+                .addClass('flex-1')
+                .removeClass('justify-start');
+        } else {
+            // For laptops
+            // console.log("here laptop")
+            $('#center-content-wrapper')
+                .html(html_content)
+                .addClass('mt-24 flex-1')
+                .removeClass('justify-start');
+        }
+        
+          
+
         $(".main-logo").css({ "margin-bottom": "20px" })
     }
     else {

@@ -1,14 +1,14 @@
 window.signupContent = `
 <div class="max-w-3xl mx-auto py-10 animate-fade-in px-4 sm:px-6 lg:px-8">
     <h1 class="text-4xl font-bold mb-6 text-center text-gray-800">Pete Client Sign Up Form</h1>
-    <p class="text-lg text-gray-700 leading-relaxed mb-4 text-center">
+    <p class="text-lg text-gray-700 leading-relaxed mb-4 ">
         Why settle for Google when you can get more, give more, and help change lives?
         Pete isn’t just about making your life easier—it’s about creating opportunity, stability, and hope for unserved and underserved urban and rural children and families nationwide.
     </p>
-    <p class="text-md text-gray-600 leading-relaxed mb-6 text-center">
+    <p class="text-md text-gray-600 leading-relaxed mb-6 ">
         Please complete the following form to register for Pete. All fields marked with an asterisk (*) are required.
     </p>
-    <p class="text-md font-semibold text-teal-700 leading-relaxed mb-8 text-center">
+    <p class="text-md font-semibold text-teal-700 leading-relaxed mb-8 ">
         Your monthly donation of $15 helps fund Essential Families’ Economic Mobility Program, supporting unserved and underserved children and families in urban and rural communities across the United States.
         Thank you for making a difference!
     </p>
@@ -30,32 +30,7 @@ window.signupContent = `
                 <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="last-name" name="last_name" type="text" placeholder="Doe">
             </div>
         </div>
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="dob">
-                Date of Birth (MM/DD/YYYY):
-            </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="dob" name="date_of_birth" type="date">
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="gender">
-                    Gender:
-                </label>
-                <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="gender" name="gender">
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="non-binary">Non-binary</option>
-                    <option value="prefer-not-say">Prefer not to say</option>
-                </select>
-            </div>
-            <!-- <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="pronouns">
-                    Preferred Pronouns:
-                </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="pronouns" name="preferred_pronouns" type="text" placeholder="e.g., She/Her, He/Him">
-            </div> -->
-        </div>
+       
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
                 *Email Address:
@@ -68,13 +43,8 @@ window.signupContent = `
             </label>
             <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="mobile-phone" name="mobile_phone_number" type="tel" placeholder="(123) 456-7890">
         </div>
-        <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="home-address">
-                Home Address (Street, City, State, Zip):
-            </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="home-address" name="home_address" type="text" placeholder="123 Main St, Anytown, CA 12345">
-        </div>
-
+        
+   
         <!-- Demographic Information -->
         <!-- <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Demographic Information</h2>
         <div class="mb-4">
@@ -207,10 +177,10 @@ window.signupContent = `
             </label>
         </div>
         
-        <p class="text-sm text-gray-600 leading-relaxed mb-6 text-center">
+        <p class="text-sm text-gray-600 leading-relaxed mb-6 ">
             By submitting this form, you are registering for Pete and supporting Essential Families’ Essential Mobility Program, which enables economic mobility for unserved and underserved urban and rural communities across the country.
         </p>
-        <p class="text-sm text-gray-600 leading-relaxed mb-6 text-center">
+        <p class="text-sm text-gray-600 leading-relaxed mb-6 ">
             Your information will remain confidential and is used only to deliver the services you request and to maintain high-quality support for all clients.
         </p>
 
@@ -221,6 +191,6 @@ window.signupContent = `
         </div>
     </form>
     <!-- Messages for Signup Form -->
-    <div id="signup-message" class="hidden text-center mt-4 p-3 rounded-lg"></div>
+    <div id="signup-message" class="hidden  mt-4 p-3 rounded-lg"></div>
 </div>
 `
