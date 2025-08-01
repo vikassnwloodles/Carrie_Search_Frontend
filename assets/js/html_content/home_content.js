@@ -3,12 +3,16 @@ window.home_content = `
 
 <form id="search-form" class="w-full max-w-3xl pb-12">
     <div class="relative flex items-center">
-        <input id="ai_search" type="text" placeholder="Search, Ask, or Write Anything!"
-            class="w-full border border-gray-200 rounded-xl py-5 pl-16 pr-32 md:pl-20 md:pr-40 text-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition-shadow" />
+        <div id="searchbox_parent_div"
+        class="w-full border border-gray-200 rounded-xl p-2 pb-12 bg-white shadow-sm transition-shadow focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-500"
+        onclick="document.getElementById('ai_search').focus()"
+        >
+            <textarea id="ai_search" type="text" placeholder="Search, Ask, or Write Anything!"
+                onkeydown="handleKeyDownOnSearchBox(event)"
+                oninput="autoGrowSearchBox(this)"
+                class="max-h-[40vh] resize-none w-full rounded-xl pt-2 pl-16 pr-32 md:pl-20 md:pr-40 text-lg bg-white focus:outline-none transition-shadow"></textarea>
+        </div>
         <div class="absolute left-4 flex items-center space-x-1 sm:space-x-2">
-
-  
-
 
 
         </div>
@@ -16,9 +20,11 @@ window.home_content = `
 
         <!-- File Metadata Box -->
         <div id="file-metadata-box"
-            class="top-3 left-3 absolute p-2  bg-white border border-gray-300 rounded-xl shadow-sm hidden">
+            class="top-3 left-3 absolute p-2 ml-3  bg-white border border-gray-300 rounded-xl shadow-sm hidden">
             <div style="float: left;">
-                <i class="fas fa-file text-teal-600 text-base sm:text-xl"></i>
+                <div class="bg-teal-600 rounded-md w-10 h-10 flex items-center justify-center">
+                    <i class="fas fa-file-pdf text-white text-2xl"></i>
+                </div>
             </div>
             <div style="float: left; margin-left: 10px; margin-right: 10px;">
                 <div class="text-xs text-gray-500 font-bold" id="uploaded_filename">test.pdf

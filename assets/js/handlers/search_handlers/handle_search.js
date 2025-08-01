@@ -182,9 +182,8 @@ window.bindSearchHandler = function () {
     });
 
 
-    $('#search-form').on('submit', function (e) {
-        e.preventDefault();
 
+    function handleAISearchSubmission() {
         if ($('#main-logo').hasClass('text-8xl')) {
             $('#center-content-wrapper').removeClass('justify-center flex-1').addClass('justify-start pt-8');
             $('#main-logo').removeClass('text-8xl mb-10').addClass('text-4xl mb-6');
@@ -193,28 +192,27 @@ window.bindSearchHandler = function () {
         const fileSelected = $('#file-upload')[0].files[0];
         const token = localStorage.getItem('accessToken');
         const searchQueryData = $('#ai_search').val();
-        if (searchQueryData === "") {
-            return
-        }
-        else {
-            hideUploadedFileMetadataBox()
-            $("#ai_search").val("").blur()
-            $("#ai_search").focus()  // Using blur and focus to hide Chrome's autocomplete popup that stays at the old position when the search box is moved to the bottom
-            $(".main-logo").addClass("hidden")
-            $("#footer").addClass("hidden")
-            $("#search-form").css({ "position": "fixed", "bottom": "-20px" })
-            $("#ai_search").attr("placeholder", "Inquire Further, Ask Another Question")
-            const dynamicHeight = $('#dynamic-content-container').height(); // or .height()
-            const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim())
-            $('#search-results-container').css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');
-            $('#dynamic-content-container').animate({
-                scrollTop: $('#dynamic-content-container')[0].scrollHeight
-            }, 500); // 500ms animation
-        }
+
+        if (searchQueryData === "") return;
+
+        hideUploadedFileMetadataBox();
+        $("#ai_search").val("").blur();
+        $("#ai_search").focus();
+        $(".main-logo").addClass("hidden");
+        $("#footer").addClass("hidden");
+        $("#search-form").css({ "position": "fixed", "bottom": "-20px" });
+        $("#ai_search").attr("placeholder", "Inquire Further, Ask Another Question");
+
+        const dynamicHeight = $('#dynamic-content-container').height();
+        const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());
+        $('#search-results-container').css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');
+        $('#dynamic-content-container').animate({
+            scrollTop: $('#dynamic-content-container')[0].scrollHeight
+        }, 500);
 
         if (!token) {
             const $searchToastBox = $(searchToastBox.trim());
-            $searchToastBox.text("Please log in to perform a search.")
+            $searchToastBox.text("Please log in to perform a search.");
             $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
             return;
         }
@@ -223,25 +221,22 @@ window.bindSearchHandler = function () {
             const isImage = fileSelected.type.startsWith("image/");
             const fieldName = isImage ? "image" : "file";
             const url = window.env.BASE_URL + (isImage ? "/api/upload-image/" : "/api/upload-doc/");
-
             const formData = new FormData();
             formData.append(fieldName, fileSelected, fileSelected.name);
 
-            var settings = {
-                "url": url,
-                "method": "POST",
-                "timeout": 0,
-                "headers": { "Authorization": "Bearer " + token },
-                "processData": false,
-                "mimeType": "multipart/form-data",
-                "contentType": false,
-                "data": formData
-            };
-
-            $.ajax(settings).done(function (response) {
+            $.ajax({
+                url: url,
+                method: "POST",
+                timeout: 0,
+                headers: { "Authorization": "Bearer " + token },
+                processData: false,
+                mimeType: "multipart/form-data",
+                contentType: false,
+                data: formData
+            }).done(function (response) {
                 var responseData = JSON.parse(response);
+                const prompt = (responseData.text_content ? `${responseData.text_content}\n\n\n${searchQueryData}` : searchQueryData);
                 var form = new FormData();
-                const prompt = (responseData.text_content ? `${responseData.text_content}\n\n\n${searchQueryData}` : searchQueryData)
                 form.append("prompt", prompt);
                 form.append("image_url", responseData.image_url);
                 form.append("model", selectedModel);
@@ -255,12 +250,11 @@ window.bindSearchHandler = function () {
                 $('#file-upload').val('');
             }).fail(function () {
                 const $searchToastBox = $(searchToastBox.trim());
-                $searchToastBox.text("Image upload failed. Please try again.")
+                $searchToastBox.text("Image upload failed. Please try again.");
                 $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
             });
 
         } else {
-
             var form = new FormData();
             form.append("prompt", searchQueryData);
             form.append("model", selectedModel);
@@ -272,6 +266,13 @@ window.bindSearchHandler = function () {
 
             searchAjax(form, token);
         }
+    }
+
+
+
+    $('#search-form').on('submit', function (e) {
+        e.preventDefault();
+        handleAISearchSubmission();
     });
 
 
@@ -410,4 +411,20 @@ window.bindSearchHandler = function () {
 
         $modelDropdown.addClass('hidden');
     });
+
+
+    window.handleKeyDownOnSearchBox = function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();      // ⛔ Prevent default newline behavior
+            handleAISearchSubmission();           // ✅ Call your message sending logic
+        }
+    }
+
+    window.autoGrowSearchBox = function (textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+    }
+
 }
+
+

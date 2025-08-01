@@ -33,7 +33,9 @@ window.bindFileUploadHandler = function () {
             $("#uploaded_filename").text(shortName)
             $("#uploaded_filesize").text(`${fileSize} KB`)
             $("#file-metadata-box").removeClass("hidden")
-            $("#ai_search").removeClass("py-5").addClass("py-20")
+            // $("#ai_search").removeClass("py-5").addClass("py-20")
+            $("#searchbox_parent_div").addClass("py-20")
+            
         } else {
             // $('#file-info').html('No file selected');
             console.log("No file selected")
@@ -43,7 +45,8 @@ window.bindFileUploadHandler = function () {
 
     window.hideUploadedFileMetadataBox = function () {
         $("#file-metadata-box").addClass("hidden")
-        $("#ai_search").addClass("py-5").removeClass("py-20")
+        // $("#ai_search").addClass("py-5").removeClass("py-20")
+        $("#searchbox_parent_div").removeClass("py-20")
         $('#file-upload').val('');
     }
 

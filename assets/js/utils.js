@@ -33,10 +33,11 @@ window.loadPageContent = function ({ html_content, is_homepage = false }) {
         } else {
             // For laptops
             // console.log("here laptop")
-            $('#center-content-wrapper')
-                .html(html_content)
-                .addClass('mt-24 flex-1')
-                .removeClass('justify-start');
+            // $('#center-content-wrapper')
+            //     .html(html_content)
+            //     .addClass('mt-24 flex-1')
+            //     .removeClass('justify-start');
+            $('#center-content-wrapper').html(html_content).addClass('justify-center flex-1').removeClass('justify-start');
         }
         
           
