@@ -80,7 +80,7 @@ window.bindSearchHandler = function () {
         if (data.images && data.images.length > 0) {
             resultsHtml += `<h3 class="text-xl font-semibold mt-6 mb-4">Related Images:</h3>
                                 <div class="image-carousel-wrapper">
-                                    <button class="carousel-arrow left" id="image-carousel-left-arrow"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="carousel-arrow left z-0" id="image-carousel-left-arrow"><i class="fas fa-chevron-left"></i></button>
                                     <div class="image-carousel-container" id="image-carousel-container">`;
             data.images.forEach(image => {
                 resultsHtml += `
@@ -89,7 +89,7 @@ window.bindSearchHandler = function () {
                         </a>`;
             });
             resultsHtml += `    </div>
-                                    <button class="carousel-arrow right" id="image-carousel-right-arrow"><i class="fas fa-chevron-right"></i></button>
+                                    <button class="carousel-arrow right z-0" id="image-carousel-right-arrow"><i class="fas fa-chevron-right"></i></button>
                                 </div>`;
         }
 
@@ -228,18 +228,20 @@ window.bindSearchHandler = function () {
 
         const fileSelected = $('#file-upload')[0].files[0];
         const token = localStorage.getItem('accessToken');
-        const searchQueryData = $('#ai_search').val();
+        // const searchQueryData = $('#ai_search').val();
+        const searchQueryData = $('#ai_search').text().trim();
 
         if (searchQueryData === "") return;
 
         hideUploadedFileMetadataBox();
-        $("#ai_search").val("").blur();
+        $("#ai_search").text("").blur();
         autoGrowSearchBox(document.getElementById("ai_search"));
         $("#ai_search").focus();
         $(".main-logo").addClass("hidden");
         $("#footer").addClass("hidden");
         $("#search-form").css({ "position": "fixed", "bottom": "-20px" });
-        $("#ai_search").attr("placeholder", "Inquire Further, Ask Another Question");
+        // $("#ai_search").attr("placeholder", "Inquire Further, Ask Another Question");
+        $("#ai_search").attr("data-placeholder", "Inquire Further, Ask Another Question");
 
         const dynamicHeight = $('#dynamic-content-container').height();
         const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());

@@ -1,17 +1,22 @@
 window.home_content = `
 <div id="search-results-container" class="w-full max-w-4xl hidden"></div>
 
-<form id="search-form" class="w-full max-w-3xl pb-12">
-    <div class="relative flex items-center">
+<form id="search-form" class="w-full max-w-4xl pb-12 bg-[#fcfcf9] rounded-xl">
+    <div class="relative flex items-center rounded-xl" style="box-shadow: 0 -5px 10px rgba(248, 248, 240, 1)">
         <div id="searchbox_parent_div"
-        class="w-full border border-gray-200 rounded-xl p-2 pb-12 bg-white shadow-sm transition-shadow focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-500"
-        onclick="document.getElementById('ai_search').focus()"
+            class="w-full border border-gray-200 rounded-xl p-2 pb-12 bg-white shadow-sm transition-shadow focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-500"
+            onclick="document.getElementById('ai_search').focus()"
         >
-            <textarea id="ai_search" type="text" placeholder="Search, Ask, or Write Anything!"
+            <div id="ai_search"
+                contenteditable="true"
+                data-placeholder="Search, Ask, or Write Anything!"
                 onkeydown="handleKeyDownOnSearchBox(event)"
-                oninput="autoGrowSearchBox(this)"
-                class="max-h-[40vh] resize-none w-full rounded-xl pt-2 pl-16 pr-32 md:pl-20 md:pr-40 text-lg bg-white focus:outline-none transition-shadow"></textarea>
+                oninput="autoGrowSearchBox(this); autoCleanContentEditable(this);"
+                class="max-h-[40vh] resize-none w-full rounded-xl pt-2 pl-16 pr-32 md:pl-20 md:pr-40 text-lg bg-white focus:outline-none transition-shadow whitespace-pre-wrap overflow-y-auto"
+                style="min-height: 50px;"
+            ></div>
         </div>
+
         <div class="absolute left-4 flex items-center space-x-1 sm:space-x-2">
 
 
@@ -54,4 +59,19 @@ window.home_content = `
 
     </div>
 </form>
+<script>
+function autoCleanContentEditable(div) {
+    // console.log(div.offsetHeight)
+    // console.log(JSON.stringify(div.textContent))
+    // console.log(div.textContent.length)
+    if (div.offsetHeight === 50 && (div.textContent === "\\n" || div.textContent === "")) {
+    // if (div.offsetHeight === 50 && div.textContent === "\\n") {
+        // alert("hello")
+        div.innerHTML = "<br>";
+    }
+    if (div.innerHTML === "<br>") {
+        div.innerHTML = ""; // Clear the unwanted <br>
+    }
+}
+</script>
 `
