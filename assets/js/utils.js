@@ -39,8 +39,8 @@ window.loadPageContent = function ({ html_content, is_homepage = false }) {
             //     .removeClass('justify-start');
             $('#center-content-wrapper').html(html_content).addClass('justify-center flex-1').removeClass('justify-start');
         }
-        
-          
+
+
 
         $(".main-logo").css({ "margin-bottom": "20px" })
     }
@@ -51,8 +51,12 @@ window.loadPageContent = function ({ html_content, is_homepage = false }) {
 }
 
 
-function parseBold(text) {
+function parsebold(text) {
     return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+}
+
+function parseItalic(text) {
+    return text.replace(/\*(.*?)\*/g, '<em>$1</em>');
 }
 
 function removeFootnotes(text) {
@@ -71,7 +75,7 @@ function buildTable(rows) {
     tableHtml += '<thead class="bg-gray-50"><tr>';
     var headerCells = headerRow.substring(1, headerRow.length - 1).split('|');
     $.each(headerCells, function (idx, cellContent) {
-        tableHtml += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">' + parseBold(removeFootnotes(cellContent)) + '</th>';
+        tableHtml += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">' + parseItalic(parsebold(removeFootnotes(cellContent))) + '</th>';
     });
     tableHtml += '</tr></thead>';
 
@@ -80,7 +84,7 @@ function buildTable(rows) {
         tableHtml += '<tr>';
         var cells = rowStr.substring(1, rowStr.length - 1).split('|');
         $.each(cells, function (cellIdx, cellContent) {
-            tableHtml += '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' + parseBold(removeFootnotes(cellContent)) + '</td>';
+            tableHtml += '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' + parseItalic(parsebold(removeFootnotes(cellContent))) + '</td>';
         });
         tableHtml += '</tr>';
     });
@@ -93,6 +97,14 @@ function buildTable(rows) {
 window.structuredData = function (rawText) {
     var rawText = rawText.replace(/<think>.*?<\/think>/gs, '');
     var lines = rawText.split('\n');
+
+    // REPLACING --- WITH <hr> (<hr> is HTML equivalent to ---)
+    for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim() === '---') {
+            lines[i] = '<hr class="my-6 border-t border-gray-300">';
+        }
+    }
+
     var htmlBuilder = [];
     var inList = false;
     var inTable = false;
@@ -135,7 +147,7 @@ window.structuredData = function (rawText) {
             return;
         }
 
-        if (trimmedLine.startsWith('## ')) {
+        if (trimmedLine.startsWith('### ')) {
             if (inList) {
                 htmlBuilder.push('</ul>');
                 inList = false;
@@ -145,10 +157,19 @@ window.structuredData = function (rawText) {
                 currentTableLines = [];
                 inTable = false;
             }
-            htmlBuilder.push('<h2 class="text-2xl font-semibold mt-4 mb-2">' + parseBold(trimmedLine.substring(3).trim()) + '</h2>');
-        }
-
-        else if (trimmedLine.startsWith('- ')) {
+            htmlBuilder.push('<h3 class="text-xl font-semibold mt-4 mb-2">' + parseItalic(parsebold(trimmedLine.substring(4).trim())) + '</h3>');
+        } else if (trimmedLine.startsWith('## ')) {
+            if (inList) {
+                htmlBuilder.push('</ul>');
+                inList = false;
+            }
+            if (inTable) {
+                htmlBuilder.push(buildTable(currentTableLines));
+                currentTableLines = [];
+                inTable = false;
+            }
+            htmlBuilder.push('<h2 class="text-2xl font-semibold mt-4 mb-2">' + parseItalic(parsebold(trimmedLine.substring(3).trim())) + '</h2>');
+        } else if (trimmedLine.startsWith('- ')) {
             if (!inList) {
                 htmlBuilder.push('<ul class="list-disc list-inside ml-4 my-2">');
                 inList = true;
@@ -158,7 +179,7 @@ window.structuredData = function (rawText) {
                 currentTableLines = [];
                 inTable = false;
             }
-            htmlBuilder.push('<li class="text-gray-700">' + parseBold(trimmedLine.substring(2).trim()) + '</li>');
+            htmlBuilder.push('<li class="text-gray-700">' + parseItalic(parsebold(trimmedLine.substring(2).trim())) + '</li>');
         }
 
         else if (trimmedLine.startsWith('|') && trimmedLine.endsWith('|')) {
@@ -180,7 +201,7 @@ window.structuredData = function (rawText) {
                 currentTableLines = [];
                 inTable = false;
             }
-            htmlBuilder.push('<p class="text-gray-700 leading-relaxed my-2">' + parseBold(trimmedLine) + '</p>');
+            htmlBuilder.push('<p class="text-gray-700 leading-relaxed my-2">' + parseItalic(parsebold(trimmedLine)) + '</p>');
         }
     });
 
@@ -259,7 +280,7 @@ window.showToast = function ({ response, toastOptions, duration = 5000 }) {
         const toastData = toastOptions.find(option => option.status_code === status);
         if (toastData) {
             if (toastData.title === undefined) toastData.title = (toastData.type === "success" ? "Success!" : "Something went wrong!")
-                showBaseToast(toastData);
+            showBaseToast(toastData);
             return;
         }
     }
@@ -513,17 +534,17 @@ window.updateAuthUI = function () {
 
 
 window.getHtmlStringHeight = function (htmlString) {
-  const $temp = $(htmlString)
-    .css({
-      visibility: "hidden",
-      position: "absolute",
-      display: "block",
-    })
-    .appendTo("body");
+    const $temp = $(htmlString)
+        .css({
+            visibility: "hidden",
+            position: "absolute",
+            display: "block",
+        })
+        .appendTo("body");
 
-  const height = $temp.outerHeight();
+    const height = $temp.outerHeight();
 
-  $temp.remove(); // clean up
+    $temp.remove(); // clean up
 
-  return height;
+    return height;
 }

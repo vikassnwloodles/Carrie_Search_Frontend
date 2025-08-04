@@ -26,8 +26,45 @@ window.bindSearchHandler = function () {
 
 
     function renderSearchResults(data) {
+        const uniqueId = Date.now() + Math.floor(Math.random() * 1000); // ensure uniqueness
+        const withLineBreaks = data.query.replace(/\n/g, "<br>");
         let resultsHtml = `<div class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200">
-                <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2>
+                <!-- <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2> -->
+                <div class="w-full border border-gray-200 bg-white rounded-xl p-4 mb-8">
+
+                    <!-- Text content -->
+                    <div id="text-container"
+                        class="text-container-${uniqueId} overflow-hidden transition-all duration-300 text-gray-800 leading-relaxed"
+                        style="max-height: 120px;">
+                        <p id="long-text" class="text-base">
+                            <strong class="block text-md mb-2">${withLineBreaks}</strong>
+                        </p>
+                    </div>
+
+                    <!-- Toggle button -->
+                    <button id="toggle-btn"
+                        class="toggle-btn-${uniqueId} text-teal-600 flex items-center gap-1 mt-3 hover:underline focus:outline-none">
+                        <span class="toggle-text-${uniqueId}" id="toggle-text">Show more</span>
+                        <svg id="toggle-icon" xmlns="http://www.w3.org/2000/svg" class="toggle-icon-${uniqueId} w-5 h-5" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path class="toggle-path-${uniqueId}" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <script>
+                            (function() {
+                                let expanded = false;
+                                $('.toggle-btn-${uniqueId}').on('click', function () {
+                                    expanded = !expanded;
+                                    $('.text-container-${uniqueId}').css("max-height", expanded ? "1000px" : "120px");
+                                    const iconPath = expanded
+                                        ? "M19 15l-7-7-7 7"
+                                        : "M19 9l-7 7-7-7";
+                                    $('.toggle-path-${uniqueId}').attr("d", iconPath);
+                                    $('.toggle-text-${uniqueId}').text(expanded ? "Show less" : "Show more");
+                                });
+                            })();
+                        </script>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">`;
 
         data.links.forEach(link => {
@@ -197,6 +234,7 @@ window.bindSearchHandler = function () {
 
         hideUploadedFileMetadataBox();
         $("#ai_search").val("").blur();
+        autoGrowSearchBox(document.getElementById("ai_search"));
         $("#ai_search").focus();
         $(".main-logo").addClass("hidden");
         $("#footer").addClass("hidden");
