@@ -131,7 +131,82 @@ window.bindSearchHandler = function () {
         });
 
 
-        resultsHtml += `<div class="bg-white p-6 rounded-lg border border-gray-200 mb-4"><p>${data.content}</p></div></div>`;
+        // resultsHtml += `<div id="response-text" class="bg-white p-6 rounded-lg border border-gray-200 mb-4"><p>${data.content}</p></div>
+        //     <div class="flex items-center justify-end mt-4">
+        //         <i id="copy-icon" class="far fa-copy text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer"></i>
+        //     </div>
+        //     <script>
+        //         $('#copy-icon').on('click', function () {
+        //             alert("copy icon clicked")
+        //             const textToCopy = $('#response-text').text().trim();
+
+        //             if (navigator.clipboard) {
+        //             navigator.clipboard.writeText(textToCopy)
+        //                 .then(() => alert("Copied to clipboard!"))
+        //                 .catch(() => alert("Failed to copy text."));
+        //             } else {
+        //             // Fallback for older browsers
+        //             const tempTextarea = $('<textarea>');
+        //             $('body').append(tempTextarea);
+        //             tempTextarea.val(textToCopy).select();
+        //             document.execCommand("copy");
+        //             tempTextarea.remove();
+        //             alert("Copied to clipboard!");
+        //             }
+        //         });
+        //     </script>
+        // </div>`;
+
+
+        // const uniqueId = Date.now(); // or use a counter if multiple results load quickly
+
+        resultsHtml += `
+            <div id="response-text-${uniqueId}" class="bg-white p-6 rounded-lg border border-gray-200 mb-4">
+                <p>${data.content}</p>
+            </div>
+
+            <div class="relative flex items-center justify-end mt-4 group">
+                <!-- Copy Icon -->
+                <i id="copy-icon-${uniqueId}"
+                class="far fa-copy text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer"></i>
+
+                <!-- Tooltip -->
+                <div id="tooltip-${uniqueId}"
+                    class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                    Copy to clipboard
+                </div>
+            </div>
+
+            <script>
+                $('#copy-icon-${uniqueId}').on('click', function () {
+                    console.log($('#response-text-${uniqueId}').html())
+                    // const textHtml = $('#response-text-${uniqueId}').html().replace(/<br\\s*\\/?>/gi, '\\n').replace(/<\\/p>/gi, '\\n').replace(/<\\/li>/gi, '\\n');
+                    const textHtml = $('#response-text-${uniqueId}')
+                        .html()
+                        .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '') // Remove empty tags (including spaces and zero-width)
+                        .replace(/<br\\s*\\/?>/gi, '\\n')
+                        .replace(/<\\/p>/gi, '\\n\\n')
+                        .replace(/<\\/li>/gi, '\\n')
+                        .replace(/<\\/ul>/gi, '\\n')   // ✅ Add newline after </ul>
+                        .replace(/<\\/ol>/gi, '\\n')  // ✅ Add newline after </ol>
+                        .replace(/<hr\\b[^>]*\\/?>/gi, '\\n'); // ✅ Match all <hr> variations
+                    console.log(textHtml)
+                    const tempDiv = document.createElement("div");
+                    tempDiv.innerHTML = textHtml;
+                    const textToCopy = tempDiv.textContent.trim();
+
+                    const $tooltip = $('#tooltip-${uniqueId}');
+
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        $tooltip.text('Copied!');
+                        setTimeout(() => $tooltip.text('Copy to clipboard'), 1500);
+                    }).catch(() => {
+                        $tooltip.text('Failed to copy');
+                        setTimeout(() => $tooltip.text('Copy to clipboard'), 1500);
+                    });
+                });
+            </script>
+            </div>`;
 
         $('#search-results-container').append(resultsHtml).show();
 
