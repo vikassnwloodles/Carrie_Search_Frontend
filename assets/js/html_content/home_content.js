@@ -74,14 +74,30 @@ function autoCleanContentEditable(div) {
     }
 }
 
+function scrollToBottom(el) {
+  el.scrollTop = el.scrollHeight;
+}
+
+// Handle paste: plain text, preserve newlines, no trim
 $('#ai_search').on('paste', function (e) {
   e.preventDefault();
   const text = (e.originalEvent || e).clipboardData.getData('text/plain');
-  document.execCommand('insertText', false, text);
+  const html = text.replace(/\\n/g, '<br>');
+  document.execCommand('insertHTML', false, html);
+  requestAnimationFrame(() => scrollToBottom(this));
 });
 
+// Handle drop: plain text, preserve newlines, no trim
 $('#ai_search').on('drop', function (e) {
   e.preventDefault();
+  const text = (e.originalEvent || e).dataTransfer.getData('text/plain');
+  const html = text.replace(/\\n/g, '<br>');
+  document.execCommand('insertHTML', false, html);
+  requestAnimationFrame(() => scrollToBottom(this));
+});
+
+$('#ai_search').on('dragenter dragover', function (e) {
+  this.focus(); // Ensures the contenteditable is focused
 });
 
 </script>

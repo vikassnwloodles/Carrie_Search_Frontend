@@ -27,6 +27,8 @@ window.bindSearchHandler = function () {
 
     function renderSearchResults(data) {
         const uniqueId = Date.now() + Math.floor(Math.random() * 1000); // ensure uniqueness
+        console.log(data.query)
+        console.log(JSON.stringify(data.query))
         const withLineBreaks = data.query.replace(/\n/g, "<br>");
         let resultsHtml = `<div class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200">
                 <!-- <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2> -->
@@ -34,10 +36,10 @@ window.bindSearchHandler = function () {
 
                     <!-- Text content -->
                     <div id="text-container"
-                        class="text-container-${uniqueId} overflow-hidden transition-all duration-300 text-gray-800 leading-relaxed"
+                        class="text-container-${uniqueId} overflow-hidden transition-all duration-300 text-black leading-relaxed"
                         style="max-height: 120px;">
                         <p id="long-text" class="text-base">
-                            <strong class="block text-md mb-2">${withLineBreaks}</strong>
+                            <strong class="block font-medium mb-2">${withLineBreaks}</strong>
                         </p>
                     </div>
 
@@ -259,7 +261,8 @@ window.bindSearchHandler = function () {
         const fileSelected = $('#file-upload')[0].files[0];
         const token = localStorage.getItem('accessToken');
         // const searchQueryData = $('#ai_search').val();
-        const searchQueryData = $('#ai_search').text().trim();
+        // const searchQueryData = $('#ai_search').text().trim();
+        const searchQueryData = $('#ai_search').html().replace(/<br\s*\/?>/gi, '\n');
 
         if (searchQueryData === "") return;
 
@@ -490,10 +493,21 @@ window.bindSearchHandler = function () {
         }
     }
 
-    window.autoGrowSearchBox = function (textarea) {
-        textarea.style.height = "auto";
-        textarea.style.height = textarea.scrollHeight + "px";
-    }
+    // window.autoGrowSearchBox = function (textarea) {
+    //     textarea.style.height = "auto";
+    //     textarea.style.height = textarea.scrollHeight + "px";
+    // }
+
+    window.autoGrowSearchBox = function (el) {
+        // Reset height to allow shrink
+        el.style.height = "auto";
+
+        // Get full height needed
+        const scrollHeight = el.scrollHeight;
+
+        // Set new height
+        el.style.height = scrollHeight + "px";
+    };
 
 }
 
