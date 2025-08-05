@@ -32,15 +32,61 @@ window.bindSearchHandler = function () {
         const withLineBreaks = data.query.replace(/\n/g, "<br>");
         let resultsHtml = `<div class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200">
                 <!-- <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2> -->
-                <div class="w-full border border-gray-200 bg-white rounded-xl p-4 mb-8">
+                <div class="w-full border border-gray-200 bg-white rounded-xl p-4 mb-8 group">
 
                     <!-- Text content -->
                     <div id="text-container"
-                        class="text-container-${uniqueId} overflow-hidden transition-all duration-300 text-black leading-relaxed"
+                        class="text-container-${uniqueId} relative overflow-hidden transition-all duration-300 text-black leading-relaxed"
                         style="max-height: 120px;">
                         <p id="long-text" class="text-base">
-                            <strong class="block font-medium mb-2">${withLineBreaks}</strong>
+                            <strong id="query-text-${uniqueId}" class="block font-medium mb-2">${withLineBreaks}</strong>
                         </p>
+
+                        <!-- Copy icon wrapper: hidden by default, visible on hover of outer group -->
+                        <div id="query-copy-icon-${uniqueId}"
+                            class="absolute bottom-0 right-0 flex items-center justify-center p-2 bg-white border h-10 w-10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer group/icon">
+                            <!-- Copy Icon -->
+                            <i
+                                class="far fa-copy"></i>
+
+                            <!-- Tooltip -->
+                            <div id="query-copy-tooltip-${uniqueId}"
+                                class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                Copy to clipboard
+                            </div>
+                        </div>
+
+                        <script>
+                            $('#query-copy-icon-${uniqueId}').on('click', function () {
+                                console.log($('#query-text-${uniqueId}').html())
+                                // const textHtml = $('#query-text-${uniqueId}').html().replace(/<br\\s*\\/?>/gi, '\\n').replace(/<\\/p>/gi, '\\n').replace(/<\\/li>/gi, '\\n');
+                                const textHtml = $('#query-text-${uniqueId}')
+                                    .html()
+                                    .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '') // Remove empty tags (including spaces and zero-width)
+                                    .replace(/<br\\s*\\/?>/gi, '\\n')
+                                    .replace(/<\\/p>/gi, '\\n\\n')
+                                    .replace(/<\\/li>/gi, '\\n')
+                                    .replace(/<\\/ul>/gi, '\\n')   // ✅ Add newline after </ul>
+                                    .replace(/<\\/ol>/gi, '\\n')  // ✅ Add newline after </ol>
+                                    .replace(/<hr\\b[^>]*\\/?>/gi, '\\n'); // ✅ Match all <hr> variations
+                                console.log(textHtml)
+                                const tempDiv = document.createElement("div");
+                                tempDiv.innerHTML = textHtml;
+                                const textToCopy = tempDiv.textContent.trim();
+
+                                const $tooltip = $('#query-copy-tooltip-${uniqueId}');
+
+                                navigator.clipboard.writeText(textToCopy).then(() => {
+                                    $tooltip.text('Copied!');
+                                    setTimeout(() => $tooltip.text('Copy to clipboard'), 1500);
+                                }).catch(() => {
+                                    $tooltip.text('Failed to copy');
+                                    setTimeout(() => $tooltip.text('Copy to clipboard'), 1500);
+                                });
+                            });
+                        </script>
+
+
                     </div>
 
                     <!-- Toggle button -->
