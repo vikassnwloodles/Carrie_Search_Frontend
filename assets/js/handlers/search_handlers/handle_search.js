@@ -224,6 +224,7 @@ window.bindSearchHandler = function () {
 
     }
 
+    let ongoingSearchRequest = null;
 
     function searchAjax(form, token) {
         var links = [];
@@ -249,7 +250,8 @@ window.bindSearchHandler = function () {
             "data": form
         };
 
-        $.ajax(settings).done(function (responseData) {
+        // 🔁 Store the jqXHR object for aborting later
+        ongoingSearchRequest = $.ajax(settings).done(function (responseData) {
             $('#loading-message').remove();
             var response = JSON.parse(responseData);
 
@@ -292,6 +294,11 @@ window.bindSearchHandler = function () {
 
         }).fail(function (e) {
             $('#loading-message').remove();
+
+            if (e.statusText === 'abort') {
+                return; // ignore aborted error
+            }
+
             if (e.responseText) {
                 var error_msg = JSON.parse(e.responseText)
             }
@@ -314,6 +321,8 @@ window.bindSearchHandler = function () {
         }).always(function () {
             // ✅ runs on both success and failure
             // $('#search-results-container').css('margin-bottom', "150px");
+            $('#search-form-btn i').addClass('fa-arrow-right').removeClass('fa-stop');
+            ongoingSearchRequest = null;
         });
     }
 
@@ -328,6 +337,22 @@ window.bindSearchHandler = function () {
 
 
     function handleAISearchSubmission() {
+
+        if ($('#search-form-btn i').hasClass('fa-stop')) {
+            if (ongoingSearchRequest) {
+                ongoingSearchRequest.abort();
+                ongoingSearchRequest = null;
+
+                $('#search-form-btn i').addClass('fa-arrow-right').removeClass('fa-stop');
+
+                const $searchToastBox = $(searchToastBox.trim());
+                $searchToastBox.text("Search aborted.");
+                $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
+            }
+            return;
+        }
+
+
         if ($('#main-logo').hasClass('text-8xl')) {
             $('#center-content-wrapper').removeClass('justify-center flex-1').addClass('justify-start pt-8');
             $('#main-logo').removeClass('text-8xl mb-10').addClass('text-4xl mb-6');
@@ -350,6 +375,7 @@ window.bindSearchHandler = function () {
         $("#search-form").css({ "position": "fixed", "bottom": "-20px" });
         // $("#ai_search").attr("placeholder", "Inquire Further, Ask Another Question");
         $("#ai_search").attr("data-placeholder", "Inquire Further, Ask Another Question");
+        $('#search-form-btn i').removeClass('fa-arrow-right').addClass('fa-stop');
 
         const dynamicHeight = $('#dynamic-content-container').height();
         const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());

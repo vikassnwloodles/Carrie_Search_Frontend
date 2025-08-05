@@ -52,6 +52,7 @@ window.home_content = `
         <i class="fa-solid fa-microphone-lines text-base sm:text-xl" id="mic-icon"></i>
     </button>
     <button type="submit"
+        id="search-form-btn"
         class="bg-teal-600 text-white rounded-lg w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-teal-700 transition-colors">
         <i class="fas fa-arrow-right text-base sm:text-xl"></i>
     </button>
