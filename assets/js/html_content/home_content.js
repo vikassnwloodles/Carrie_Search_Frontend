@@ -73,5 +73,16 @@ function autoCleanContentEditable(div) {
         div.innerHTML = ""; // Clear the unwanted <br>
     }
 }
+
+$('#ai_search').on('paste', function (e) {
+  e.preventDefault();
+  const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+  document.execCommand('insertText', false, text);
+});
+
+$('#ai_search').on('drop', function (e) {
+  e.preventDefault();
+});
+
 </script>
 `

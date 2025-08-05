@@ -50,32 +50,62 @@ window.bindSearchHandler = function () {
                             <path class="toggle-path-${uniqueId}" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
+
                     <script>
-                            (function() {
-                                let expanded = false;
-                                $('.toggle-btn-${uniqueId}').on('click', function () {
-                                    expanded = !expanded;
-                                    $('.text-container-${uniqueId}').css("max-height", expanded ? "1000px" : "120px");
-                                    const iconPath = expanded
-                                        ? "M19 15l-7-7-7 7"
-                                        : "M19 9l-7 7-7-7";
-                                    $('.toggle-path-${uniqueId}').attr("d", iconPath);
-                                    $('.toggle-text-${uniqueId}').text(expanded ? "Show less" : "Show more");
-                                });
-                            })();
-                        </script>
+                    (function () {
+                        const textContainer = $('.text-container-${uniqueId}');
+                        const toggleBtn = $('.toggle-btn-${uniqueId}');
+                        let expanded = false;
+
+                        // Temporarily expand to check actual height
+                        textContainer.css("max-height", "none");
+                        const actualHeight = textContainer[0].scrollHeight;
+                        textContainer.css("max-height", "120px");
+
+                        if (actualHeight <= 120) {
+                        toggleBtn.hide(); // Hide toggle if content doesn't overflow
+                        } else {
+                        toggleBtn.show(); // Ensure toggle is visible if needed
+                        }
+
+                        toggleBtn.on('click', function () {
+                        expanded = !expanded;
+                        textContainer.css("max-height", expanded ? "1000px" : "120px");
+                        const iconPath = expanded
+                            ? "M19 15l-7-7-7 7"
+                            : "M19 9l-7 7-7-7";
+                        $('.toggle-path-${uniqueId}').attr("d", iconPath);
+                        $('.toggle-text-${uniqueId}').text(expanded ? "Show less" : "Show more");
+                        });
+                    })();
+                    </script>
+
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">`;
+                <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"> -->
+                `;
 
-        data.links.forEach(link => {
-            resultsHtml += `
-                    <div class="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-                        <h3 class="font-semibold text-teal-700">${link.title}</h3>
-                        <a href="${link.url}" target="_blank" class="text-sm text-gray-500 truncate block">${link.url}</a>
-                    </div>`;
-        });
+        // data.links.forEach(link => {
+        //     resultsHtml += `
+        //             <div class="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+        //                 <h3 class="font-semibold text-teal-700">${link.title}</h3>
+        //                 <a href="${link.url}" target="_blank" class="text-sm text-gray-500 truncate block">${link.url}</a>
+        //             </div>`;
+        // });
 
-        resultsHtml += `</div>`;
+        // resultsHtml += `</div>`;
+        if (data.links && data.links.length > 0) {
+            resultsHtml += `<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">`;
+
+            data.links.forEach(link => {
+                resultsHtml += `
+            <div class="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+                <h3 class="font-semibold text-teal-700">${link.title}</h3>
+                <a href="${link.url}" target="_blank" class="text-sm text-gray-500 truncate block">${link.url}</a>
+            </div>`;
+            });
+
+            resultsHtml += `</div>`;
+        }
 
         if (data.images && data.images.length > 0) {
             resultsHtml += `<h3 class="text-xl font-semibold mt-6 mb-4">Related Images:</h3>
