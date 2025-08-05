@@ -590,7 +590,9 @@ window.bindSearchHandler = function () {
     window.handleKeyDownOnSearchBox = function (e) {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();      // ⛔ Prevent default newline behavior
-            handleAISearchSubmission();           // ✅ Call your message sending logic
+            if ($('#search-form-btn i').hasClass('fa-arrow-right')) {
+                handleAISearchSubmission();           // ✅ Call your message sending logic
+            }
         }
     }
 
