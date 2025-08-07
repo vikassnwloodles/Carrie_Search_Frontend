@@ -25,70 +25,188 @@ window.bindSearchHandler = function () {
     });
 
 
-    function renderSearchResults(data) {
+    function renderSearchResults(data, loadingHtmlContainerId = null) {
         const uniqueId = Date.now() + Math.floor(Math.random() * 1000); // ensure uniqueness
         console.log(data.query)
         console.log(JSON.stringify(data.query))
         const withLineBreaks = data.query.replace(/\n/g, "<br>");
-        let resultsHtml = `<div class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200">
+        let resultsHtml = `<div id="individual-search-result-${uniqueId}" class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200">
                 <!-- <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2> -->
-                <div class="w-full border border-gray-200 bg-white rounded-xl p-4 mb-8 group">
+<!-- Main container -->
+<div id="text-container-${uniqueId}" class="w-full border border-gray-200 bg-white rounded-xl pl-4 pt-4 pb-8 pr-2 mb-8 group relative">
 
-                    <!-- Text content -->
-                    <div id="text-container"
-                        class="text-container-${uniqueId} relative overflow-hidden transition-all duration-300 text-black leading-relaxed"
-                        style="max-height: 120px;">
-                        <p id="long-text" class="text-base">
-                            <strong id="query-text-${uniqueId}" class="block font-medium mb-2">${withLineBreaks}</strong>
-                        </p>
+  <!-- Text content -->
+  <div
+    class="text-container-${uniqueId} relative overflow-hidden transition-all duration-300 text-black leading-relaxed"
+    style="max-height: 120px;">
+    <p id="long-text" class="text-base">
+      <strong id="query-text-${uniqueId}" onfocus="handleQueryContainerFocus(this); placeCaretAtEnd(this);" onblur="handleQueryContainerBlur(this)" class="block font-medium focus:outline-none" contenteditable="false">${withLineBreaks}</strong>
+      <script>
+            function placeCaretAtEnd(el) {
+                el.focus();
+                if (typeof window.getSelection != "undefined"
+                    && typeof document.createRange != "undefined") {
+                const range = document.createRange();
+                range.selectNodeContents(el);
+                range.collapse(false); // Move caret to end
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                }
+            }
+            function handleQueryContainerFocus(el) {
+                $('#text-container-${uniqueId}').addClass('ring-2 ring-blue-500');
+            }
+            function handleQueryContainerBlur(el) {
+                $('#text-container-${uniqueId}').removeClass('ring-2', 'ring-blue-500');
+            }
+      </script>
+      </p>
+  </div>
 
-                        <!-- Copy icon wrapper: hidden by default, visible on hover of outer group -->
-                        <div id="query-copy-icon-${uniqueId}"
-                            class="absolute bottom-0 right-0 flex items-center justify-center p-2 bg-white border h-10 w-10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer group/icon">
-                            <!-- Copy Icon -->
-                            <i
-                                class="far fa-copy"></i>
+  <!-- Icon wrapper -->
+  <div class="absolute bottom-0 right-0 flex space-x-2 opacity-100 group-hover:opacity-100 transition-opacity duration-200">
 
-                            <!-- Tooltip -->
-                            <div id="query-copy-tooltip-${uniqueId}"
-                                class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none">
-                                Copy to clipboard
-                            </div>
-                        </div>
+    <!-- Copy Icon -->
+    <div class="relative group/icon">
+      <div id="query-copy-icon-${uniqueId}"
+        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer">
+        <i class="far fa-copy"></i>
+      </div>
+      <div id="query-copy-tooltip-${uniqueId}"
+        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none">
+        Copy to clipboard
+      </div>
+    </div>
 
-                        <script>
-                            $('#query-copy-icon-${uniqueId}').on('click', function () {
-                                console.log($('#query-text-${uniqueId}').html())
-                                // const textHtml = $('#query-text-${uniqueId}').html().replace(/<br\\s*\\/?>/gi, '\\n').replace(/<\\/p>/gi, '\\n').replace(/<\\/li>/gi, '\\n');
-                                const textHtml = $('#query-text-${uniqueId}')
-                                    .html()
-                                    .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '') // Remove empty tags (including spaces and zero-width)
-                                    .replace(/<br\\s*\\/?>/gi, '\\n')
-                                    .replace(/<\\/p>/gi, '\\n\\n')
-                                    .replace(/<\\/li>/gi, '\\n')
-                                    .replace(/<\\/ul>/gi, '\\n')   // ✅ Add newline after </ul>
-                                    .replace(/<\\/ol>/gi, '\\n')  // ✅ Add newline after </ol>
-                                    .replace(/<hr\\b[^>]*\\/?>/gi, '\\n'); // ✅ Match all <hr> variations
-                                console.log(textHtml)
-                                const tempDiv = document.createElement("div");
-                                tempDiv.innerHTML = textHtml;
-                                const textToCopy = tempDiv.textContent.trim();
-
-                                const $tooltip = $('#query-copy-tooltip-${uniqueId}');
-
-                                navigator.clipboard.writeText(textToCopy).then(() => {
-                                    $tooltip.text('Copied!');
-                                    setTimeout(() => $tooltip.text('Copy to clipboard'), 1500);
-                                }).catch(() => {
-                                    $tooltip.text('Failed to copy');
-                                    setTimeout(() => $tooltip.text('Copy to clipboard'), 1500);
-                                });
-                            });
-                        </script>
+    <!-- Edit Icon -->
+    <div class="relative group/edit">
+      <div id="query-edit-icon-${uniqueId}"
+        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-gray-600 text-xl hover:text-blue-600 transition-colors cursor-pointer">
+        <i class="far fa-edit"></i>
+      </div>
+      <div
+        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
+        Edit text
+      </div>
+    </div>
 
 
-                    </div>
+    <!-- Confirm (Tick) Icon -->
+    <div id="confirm-edit-${uniqueId}" class="relative group/icon hidden">
+      <div 
+        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-green-700 text-xl transition-colors cursor-pointer">
+        <i class="fas fa-check"></i>
+      </div>
+      <div id="query-copy-tooltip-${uniqueId}"
+        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none">
+        Confirm
+      </div>
+    </div>
 
+    <!-- Cancel (Cross) Icon -->
+    <div id="cancel-edit-${uniqueId}" class="relative group/edit hidden">
+      <div 
+        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-red-700 text-xl transition-colors cursor-pointer">
+        <i class="fas fa-times"></i>
+      </div>
+      <div
+        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
+        Cancel
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- JS for Copy and Edit Functionality -->
+  <script>
+    const $queryCopyTooltip_${uniqueId} = $('#query-copy-tooltip-${uniqueId}');
+    const $text_${uniqueId} = $('#query-text-${uniqueId}');
+    const $edit_${uniqueId} = $('#query-edit-icon-${uniqueId}');
+    const $confirm_${uniqueId} = $('#confirm-edit-${uniqueId}');
+    const $cancel_${uniqueId} = $('#cancel-edit-${uniqueId}');
+    const $copy_${uniqueId} = $('#query-copy-icon-${uniqueId}');
+    const originalText_${uniqueId} = $text_${uniqueId}.html(); // Preserve original
+
+    $copy_${uniqueId}.on('click', function () {
+      const textHtml = $text_${uniqueId}.html()
+        .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '')
+        .replace(/<br\\s*\\/?>/gi, '\\n')
+        .replace(/<\\/p>/gi, '\\n\\n')
+        .replace(/<\\/li>/gi, '\\n')
+        .replace(/<\\/ul>/gi, '\\n')
+        .replace(/<\\/ol>/gi, '\\n')
+        .replace(/<hr\\b[^>]*\\/?>/gi, '\\n');
+
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = textHtml;
+      const textToCopy = tempDiv.textContent.trim();
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        $queryCopyTooltip_${uniqueId}.text('Copied!');
+        setTimeout(() => $queryCopyTooltip_${uniqueId}.text('Copy to clipboard'), 1500);
+      }).catch(() => {
+        $queryCopyTooltip_${uniqueId}.text('Failed to copy');
+        setTimeout(() => $queryCopyTooltip_${uniqueId}.text('Copy to clipboard'), 1500);
+      });
+    });
+
+    $edit_${uniqueId}.on('click', function () {
+      $text_${uniqueId}.attr('contenteditable', true).focus();
+      $edit_${uniqueId}.hide();
+      $copy_${uniqueId}.hide();
+      $confirm_${uniqueId}.show();
+      $cancel_${uniqueId}.show();
+    });
+
+    $confirm_${uniqueId}.on('click', function (event) {
+    const el = event.currentTarget;
+      console.log(el)
+      $text_${uniqueId}.attr('contenteditable', false);
+      $confirm_${uniqueId}.hide();
+      $cancel_${uniqueId}.hide();
+      $edit_${uniqueId}.show();
+      alert("hello")
+      const textHtml = $text_${uniqueId}.html()
+        .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '')
+        .replace(/<br\\s*\\/?>/gi, '\\n')
+        .replace(/<\\/p>/gi, '\\n\\n')
+        .replace(/<\\/li>/gi, '\\n')
+        .replace(/<\\/ul>/gi, '\\n')
+        .replace(/<\\/ol>/gi, '\\n')
+        .replace(/<hr\\b[^>]*\\/?>/gi, '\\n');
+
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = textHtml;
+      const textToSend = tempDiv.textContent.trim();
+      
+    const resultDiv = el.closest('div[id^="individual-search-result-"]');
+    if (resultDiv) {
+        console.log('Found parent ID:', resultDiv.id);
+
+        const token = localStorage.getItem('accessToken');
+        var form = new FormData();
+        form.append('prompt', textToSend);
+        form.append('return_images', true);
+        searchAjax(form, token, resultDiv.id);
+
+    } else {
+        console.log('No matching parent found.');
+    }
+
+    });
+
+    $cancel_${uniqueId}.on('click', function () {
+      $text_${uniqueId}.html(originalText_${uniqueId});
+      $text_${uniqueId}.attr('contenteditable', false);
+      $confirm_${uniqueId}.hide();
+      $cancel_${uniqueId}.hide();
+      $edit_${uniqueId}.show();
+      $copy_${uniqueId}.show();
+    });
+  </script>
+</div>
                     <!-- Toggle button -->
                     <button id="toggle-btn"
                         class="toggle-btn-${uniqueId} text-teal-600 flex items-center gap-1 mt-3 hover:underline focus:outline-none">
@@ -116,7 +234,7 @@ window.bindSearchHandler = function () {
                         toggleBtn.show(); // Ensure toggle is visible if needed
                         }
 
-                        toggleBtn.on('click', function () {
+                        toggleBtn.add($('#query-edit-icon-${uniqueId}')).add($('#cancel-edit-${uniqueId}')).on('click', function () {
                         expanded = !expanded;
                         textContainer.css("max-height", expanded ? "1000px" : "120px");
                         const iconPath = expanded
@@ -128,7 +246,7 @@ window.bindSearchHandler = function () {
                     })();
                     </script>
 
-                </div>
+                <!-- </div> -->
                 <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"> -->
                 `;
 
@@ -217,7 +335,7 @@ window.bindSearchHandler = function () {
                 class="far fa-copy text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer"></i>
 
                 <!-- Tooltip -->
-                <div id="tooltip-${uniqueId}"
+                <div id="result-copy-tooltip-${uniqueId}"
                     class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                     Copy to clipboard
                 </div>
@@ -241,20 +359,28 @@ window.bindSearchHandler = function () {
                     tempDiv.innerHTML = textHtml;
                     const textToCopy = tempDiv.textContent.trim();
 
-                    const $tooltip = $('#tooltip-${uniqueId}');
+                    const $resultCopyTooltip_${uniqueId} = $('#result-copy-tooltip-${uniqueId}');
 
                     navigator.clipboard.writeText(textToCopy).then(() => {
-                        $tooltip.text('Copied!');
-                        setTimeout(() => $tooltip.text('Copy to clipboard'), 1500);
+                        $resultCopyTooltip_${uniqueId}.text('Copied!');
+                        setTimeout(() => $resultCopyTooltip_${uniqueId}.text('Copy to clipboard'), 1500);
                     }).catch(() => {
-                        $tooltip.text('Failed to copy');
-                        setTimeout(() => $tooltip.text('Copy to clipboard'), 1500);
+                        $resultCopyTooltip_${uniqueId}.text('Failed to copy');
+                        setTimeout(() => $resultCopyTooltip_${uniqueId}.text('Copy to clipboard'), 1500);
                     });
                 });
             </script>
             </div>`;
 
-        $('#search-results-container').append(resultsHtml).show();
+        // if (individualSearchResultContainerId) {
+        //     // Replace the specific individual result container inside the main container
+        //     $('#' + individualSearchResultContainerId).replaceWith(resultsHtml);
+        // } else {
+        //     // Append new result to the main container
+        //     $('#search-results-container').append(resultsHtml).show();
+        // }
+        $(`#${loadingHtmlContainerId}`).replaceWith(resultsHtml);
+
 
         $('#image-carousel-left-arrow').on('click', function () {
             $('#image-carousel-container').animate({
@@ -272,7 +398,7 @@ window.bindSearchHandler = function () {
 
     let ongoingSearchRequest = null;
 
-    function searchAjax(form, token) {
+    window.searchAjax = function (form, token, individualSearchResultContainerId = null) {
         var links = [];
         var content = null;
         var images = [];
@@ -282,8 +408,27 @@ window.bindSearchHandler = function () {
         const $searchToastBox = $(searchToastBox.trim());
         $searchToastBox.attr("id", "loading-message").text("Please standby, Pete is working to make your life and work easier...!")
         $searchToastBox.addClass("animate-fade-in text-gray-500").removeClass("text-red-500 mb-8")
+        const dynamicHeight = $('#dynamic-content-container').height();
+        const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());
+        // $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');
+        $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 150 + 'px');
+
+        // const loadingHtml = $searchToastBox.prop("outerHTML");
+        const loadingHtmlContainerId = "loading-message-" + Date.now(); // or any unique logic
+        $searchToastBox.attr("id", loadingHtmlContainerId);
         const loadingHtml = $searchToastBox.prop("outerHTML");
-        $('#search-results-container').append(loadingHtml).show();
+        console.log(loadingHtml)
+
+
+        if (individualSearchResultContainerId) {
+            const $loadingElement = $(loadingHtml); // Convert string to jQuery element
+            $loadingElement.css('margin-bottom', '32px'); // Apply CSS
+            $(`#${individualSearchResultContainerId}`).replaceWith($loadingElement); // Replace
+        }
+        else{
+            $('#search-results-container').append(loadingHtml).show();
+        }
+
 
         var settings = {
             "url": window.env.BASE_URL + "/api/search/",
@@ -298,7 +443,7 @@ window.bindSearchHandler = function () {
 
         // 🔁 Store the jqXHR object for aborting later
         ongoingSearchRequest = $.ajax(settings).done(function (responseData) {
-            $('#loading-message').remove();
+            // $('#loading-message').remove();
             var response = JSON.parse(responseData);
 
             if (response && response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
@@ -327,7 +472,7 @@ window.bindSearchHandler = function () {
                     images: images,
                     content: content
                 };
-                renderSearchResults(mockResponse);
+                renderSearchResults(mockResponse, loadingHtmlContainerId);
 
             } else {
                 $('#loading-message').remove();
@@ -382,8 +527,7 @@ window.bindSearchHandler = function () {
 
 
 
-    function handleAISearchSubmission() {
-
+    window.handleAISearchSubmission = function () {
         if ($('#search-form-btn i').hasClass('fa-stop')) {
             if (ongoingSearchRequest) {
                 ongoingSearchRequest.abort();
@@ -423,12 +567,13 @@ window.bindSearchHandler = function () {
         $("#ai_search").attr("data-placeholder", "Inquire Further, Ask Another Question");
         $('#search-form-btn i').removeClass('fa-arrow-right').addClass('fa-stop');
 
-        const dynamicHeight = $('#dynamic-content-container').height();
-        const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());
-        $('#search-results-container').css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');
+        // const dynamicHeight = $('#dynamic-content-container').height();
+        // const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());
+        // $('#search-results-container').css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');
         $('#dynamic-content-container').animate({
             scrollTop: $('#dynamic-content-container')[0].scrollHeight
         }, 500);
+        $('#center-content-wrapper').removeClass('justify-center');
 
         if (!token) {
             const $searchToastBox = $(searchToastBox.trim());
