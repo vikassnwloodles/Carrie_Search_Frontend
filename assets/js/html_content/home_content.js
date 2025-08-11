@@ -28,7 +28,7 @@ window.home_content = `
             class="top-3 left-3 absolute p-2 ml-3  bg-white border border-gray-300 rounded-xl shadow-sm hidden">
             <div style="float: left;">
                 <div class="bg-teal-600 rounded-md w-10 h-10 flex items-center justify-center">
-                    <i class="fas fa-file-pdf text-white text-2xl"></i>
+                    <i id="uploaded-file-icon" class="fas fa-file-pdf text-white text-2xl"></i>
                 </div>
             </div>
             <div style="float: left; margin-left: 10px; margin-right: 10px;">

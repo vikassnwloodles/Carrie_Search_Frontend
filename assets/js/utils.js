@@ -507,7 +507,15 @@ window.updateUIForUnauthUser = function () {
     $("#user_profile_icon span").addClass("hidden")
 }
 
-const non_home_routes = [
+// const non_home_routes = [
+//     $("#about-us-link"),
+//     $(".how-carrie-works-link"),
+//     $("#library-link"),
+//     $("#pricing-link"),
+//     $("#logout-link"),
+// ]
+
+const routes = [
     $("#about-us-link"),
     $(".how-carrie-works-link"),
     $("#library-link"),
@@ -525,9 +533,10 @@ window.updateAuthUI = function () {
     // Show the footer again when navigating from the Home route to any non-Home route.
     // This is necessary because the footer was hidden on the Home route to make space 
     // for displaying search results.
-    non_home_routes.forEach(non_home_route => {
+    routes.forEach(non_home_route => {
         non_home_route.on("click", function () {
             $("#footer").removeClass("hidden");
+            $("#dummy-footer").addClass("hidden");
         });
     });
 }

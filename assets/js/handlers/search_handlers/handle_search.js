@@ -11,7 +11,6 @@ window.bindSearchHandler = function () {
 
 
     $('#pro-mode-button').click(function () {
-        alert("hi")
         $('#model-select-container').removeClass("hidden")
         $(this).removeClass('text-gray-500').addClass('text-blue-500')
         $('#deep-research-button').removeClass('text-blue-500').addClass('text-gray-500')
@@ -27,8 +26,6 @@ window.bindSearchHandler = function () {
 
     function renderSearchResults(data, loadingHtmlContainerId = null) {
         const uniqueId = Date.now() + Math.floor(Math.random() * 1000); // ensure uniqueness
-        console.log(data.query)
-        console.log(JSON.stringify(data.query))
         const withLineBreaks = data.query.replace(/\n/g, "<br>");
         let resultsHtml = `<div id="individual-search-result-${uniqueId}" class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200">
                 <!-- <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2> -->
@@ -40,26 +37,96 @@ window.bindSearchHandler = function () {
     class="text-container-${uniqueId} relative overflow-hidden transition-all duration-300 text-black leading-relaxed"
     style="max-height: 120px;">
     <p id="long-text" class="text-base">
-      <strong id="query-text-${uniqueId}" onfocus="handleQueryContainerFocus(this); placeCaretAtEnd(this);" onblur="handleQueryContainerBlur(this)" class="block font-medium focus:outline-none" contenteditable="false">${withLineBreaks}</strong>
+      <!-- <strong id="query-text-${uniqueId}" onfocus="handleQueryContainerFocus(this)" onblur="handleQueryContainerBlur(this)" class="block font-medium focus:outline-none" contenteditable="false">${withLineBreaks}</strong> -->
+      <strong 
+        id="query-text-${uniqueId}" 
+        onfocus="handleQueryContainerFocus(this)" 
+        onblur="handleQueryContainerBlur(this)" 
+        onpaste="handleOnQueryPaste(event, '${uniqueId}')"
+        ondrop="handleOnQueryDrop(event, '${uniqueId}')"
+        class="block font-medium focus:outline-none" 
+        contenteditable="false"
+      >
+        ${withLineBreaks}
+      </strong>
       <script>
-            function placeCaretAtEnd(el) {
-                el.focus();
-                if (typeof window.getSelection != "undefined"
-                    && typeof document.createRange != "undefined") {
-                const range = document.createRange();
-                range.selectNodeContents(el);
-                range.collapse(false); // Move caret to end
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-                }
-            }
+
+      function handleOnQueryPaste(e, localUniqueId) {
+    e.preventDefault();
+
+    const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+    const html = text.replace(/\\n/g, '<br>');
+    document.execCommand('insertHTML', false, html);
+    requestAnimationFrame(() => scrollToBottom(document.getElementById('query-text-'+localUniqueId)));
+
+    const textContainer = $('.text-container-'+localUniqueId);
+    console.log('.text-container-'+localUniqueId)
+    let distanceFromTop = textContainer.offset().top;
+    let viewportHeight = $(window).height();
+    let remainingViewportHeight = viewportHeight - distanceFromTop;
+    let viewportVerticalOffsetForEditQuery = $('#search-form').outerHeight(true) + 46;
+
+    textContainer.css("max-height", "none");
+    const actualHeight = textContainer[0].scrollHeight;
+
+    if (actualHeight > (remainingViewportHeight - viewportVerticalOffsetForEditQuery)) {
+        $('#dynamic-content-container')[0].scrollTop += 
+            (actualHeight - (remainingViewportHeight - viewportVerticalOffsetForEditQuery));
+    }
+}
+
+      function handleOnQueryDrop(e, localUniqueId) {
+    e.preventDefault();
+
+    const text = (e.originalEvent || e).dataTransfer.getData('text/plain');
+    const html = text.replace(/\\n/g, '<br>');
+    document.execCommand('insertHTML', false, html);
+    requestAnimationFrame(() => scrollToBottom(document.getElementById('query-text-'+localUniqueId)));
+
+    const textContainer = $('.text-container-'+localUniqueId);
+    console.log('.text-container-'+localUniqueId)
+    let distanceFromTop = textContainer.offset().top;
+    let viewportHeight = $(window).height();
+    let remainingViewportHeight = viewportHeight - distanceFromTop;
+    let viewportVerticalOffsetForEditQuery = $('#search-form').outerHeight(true) + 46;
+
+    textContainer.css("max-height", "none");
+    const actualHeight = textContainer[0].scrollHeight;
+
+    if (actualHeight > (remainingViewportHeight - viewportVerticalOffsetForEditQuery)) {
+        $('#dynamic-content-container')[0].scrollTop += 
+            (actualHeight - (remainingViewportHeight - viewportVerticalOffsetForEditQuery));
+    }
+}
+
+
+      
+function placeCaretAtEnd(el) {
+  if (!el) return;
+  // Create range and move caret to end
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  range.collapse(false); // move to end
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+            //function handleQueryContainerFocus(el) {
+            //console.log(el)
+            //    $('#text-container-${uniqueId}').addClass('ring-2 ring-blue-500');
+            //}
+            //function handleQueryContainerBlur(el) {
+            //    $('#text-container-${uniqueId}').removeClass('ring-2', 'ring-blue-500');
+            //}
+
             function handleQueryContainerFocus(el) {
-                $('#text-container-${uniqueId}').addClass('ring-2 ring-blue-500');
-            }
-            function handleQueryContainerBlur(el) {
-                $('#text-container-${uniqueId}').removeClass('ring-2', 'ring-blue-500');
-            }
+    // Find closest ancestor div with id starting with "text-container-"
+    $(el).closest('div[id^="text-container-"]').addClass('ring-2 ring-blue-500');
+}
+
+function handleQueryContainerBlur(el) {
+    $(el).closest('div[id^="text-container-"]').removeClass('ring-2 ring-blue-500');
+}
       </script>
       </p>
   </div>
@@ -152,13 +219,37 @@ window.bindSearchHandler = function () {
       });
     });
 
-    $edit_${uniqueId}.on('click', function () {
-      $text_${uniqueId}.attr('contenteditable', true).focus();
-      $edit_${uniqueId}.hide();
-      $copy_${uniqueId}.hide();
-      $confirm_${uniqueId}.show();
-      $cancel_${uniqueId}.show();
-    });
+$edit_${uniqueId}.on('click', function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  expanded = true;
+  $('.text-container-${uniqueId}').css('max-height', 'none');
+
+  $edit_${uniqueId}.hide();
+  $copy_${uniqueId}.hide();
+  $confirm_${uniqueId}.show();
+  $cancel_${uniqueId}.show();
+
+  // Make editable first
+  $text_${uniqueId}.attr('contenteditable', true);
+
+  // Apply the same highlight ring behavior here
+  // handleQueryContainerFocus($text_${uniqueId}[0]);
+
+  // Focus without scroll jump
+  try {
+    $text_${uniqueId}[0].focus({ preventScroll: true });
+  } catch {
+    $text_${uniqueId}[0].focus();
+  }
+
+  // Move caret to end after focus settles
+  requestAnimationFrame(() => {
+    placeCaretAtEnd($text_${uniqueId}[0]);
+  });
+});
+
 
     $confirm_${uniqueId}.on('click', function (event) {
     const el = event.currentTarget;
@@ -167,15 +258,18 @@ window.bindSearchHandler = function () {
       $confirm_${uniqueId}.hide();
       $cancel_${uniqueId}.hide();
       $edit_${uniqueId}.show();
-      alert("hello")
+
       const textHtml = $text_${uniqueId}.html()
         .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '')
-        .replace(/<br\\s*\\/?>/gi, '\\n')
+        // .replace(/<br\\s*\\/?>/gi, '\\n')
+        .replace(/<br[^>]*>/gi, '\\n')
         .replace(/<\\/p>/gi, '\\n\\n')
         .replace(/<\\/li>/gi, '\\n')
         .replace(/<\\/ul>/gi, '\\n')
         .replace(/<\\/ol>/gi, '\\n')
         .replace(/<hr\\b[^>]*\\/?>/gi, '\\n');
+
+      console.log(textHtml)
 
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = textHtml;
@@ -206,16 +300,19 @@ window.bindSearchHandler = function () {
       $copy_${uniqueId}.show();
     });
   </script>
-</div>
-                    <!-- Toggle button -->
+
+                      <!-- Toggle button -->
                     <button id="toggle-btn"
-                        class="toggle-btn-${uniqueId} text-teal-600 flex items-center gap-1 mt-3 hover:underline focus:outline-none">
+                        class="absolute bottom-0 toggle-btn-${uniqueId} text-teal-600 flex items-center gap-1 hover:underline focus:outline-none">
+                        <!-- class="toggle-btn-${uniqueId} text-teal-600 flex items-center gap-1 mt-3 hover:underline focus:outline-none"> -->
                         <span class="toggle-text-${uniqueId}" id="toggle-text">Show more</span>
                         <svg id="toggle-icon" xmlns="http://www.w3.org/2000/svg" class="toggle-icon-${uniqueId} w-5 h-5" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path class="toggle-path-${uniqueId}" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
+
+</div>
 
                     <script>
                     (function () {
@@ -226,6 +323,7 @@ window.bindSearchHandler = function () {
                         // Temporarily expand to check actual height
                         textContainer.css("max-height", "none");
                         const actualHeight = textContainer[0].scrollHeight;
+                        console.log(actualHeight)
                         textContainer.css("max-height", "120px");
 
                         if (actualHeight <= 120) {
@@ -234,9 +332,35 @@ window.bindSearchHandler = function () {
                         toggleBtn.show(); // Ensure toggle is visible if needed
                         }
 
-                        toggleBtn.add($('#query-edit-icon-${uniqueId}')).add($('#cancel-edit-${uniqueId}')).on('click', function () {
-                        expanded = !expanded;
-                        textContainer.css("max-height", expanded ? "1000px" : "120px");
+                        toggleBtn.add($('#query-edit-icon-${uniqueId}')).add($('#cancel-edit-${uniqueId}')).on('click', function (e) {
+
+                        if (expanded === false){
+                            if (!$(e.currentTarget).is('#cancel-edit-${uniqueId}')) {
+                                expanded = true
+                                if($(e.currentTarget).is('#query-edit-icon-${uniqueId}')){
+                                    let distanceFromTop = $('.text-container-${uniqueId}').offset().top;
+                                    let viewportHeight = $(window).height();
+                                    let remainingViewportHeight = viewportHeight - distanceFromTop
+
+                                    let viewportVerticalOffsetForEditQuery = $('#search-form').outerHeight(true) + 46
+                                    if (actualHeight > (remainingViewportHeight-viewportVerticalOffsetForEditQuery)){
+                                        // alert("some portion of query box is out of viewport")
+                                        $('#dynamic-content-container')[0].scrollTop += (actualHeight - (remainingViewportHeight-viewportVerticalOffsetForEditQuery));
+                                    }
+                                }
+                            }
+                        }
+                        else{
+                            if (!$(e.currentTarget).is('#query-edit-icon-${uniqueId}')) {
+                                expanded = false
+                                if(($('#individual-search-result-${uniqueId}').offset().top - 88) < 0){
+                                    $('#individual-search-result-${uniqueId}')[0].scrollIntoView(true);
+                                }
+                            }
+                        }
+
+                        // textContainer.css("max-height", expanded ? "1000px" : "120px");
+                        textContainer.css("max-height", expanded ? "none" : "120px");
                         const iconPath = expanded
                             ? "M19 15l-7-7-7 7"
                             : "M19 9l-7 7-7-7";
@@ -380,7 +504,13 @@ window.bindSearchHandler = function () {
         //     $('#search-results-container').append(resultsHtml).show();
         // }
         $(`#${loadingHtmlContainerId}`).replaceWith(resultsHtml);
-
+        
+        // KEEP LOADING ELEMENT ON THE TOP AFTER REPLACEMENT
+        $(`#individual-search-result-${uniqueId}`)[0].scrollIntoView(true);  // instant scroll - no animation/smoothness
+        // $(`#individual-search-result-${uniqueId}`)[0].scrollIntoView({
+        //     behavior: "smooth",  // Smooth animation
+        //     block: "start"       // Align to top
+        // });
 
         $('#image-carousel-left-arrow').on('click', function () {
             $('#image-carousel-container').animate({
@@ -397,8 +527,13 @@ window.bindSearchHandler = function () {
     }
 
     let ongoingSearchRequest = null;
+    let loadingHtmlContainerId = null;
 
     window.searchAjax = function (form, token, individualSearchResultContainerId = null) {
+        if ($('#search-form-btn i').hasClass('fa-arrow-right')) {
+            $('#search-form-btn i').addClass('fa-stop').removeClass('fa-arrow-right');
+        }
+
         var links = [];
         var content = null;
         var images = [];
@@ -414,22 +549,29 @@ window.bindSearchHandler = function () {
         $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 150 + 'px');
 
         // const loadingHtml = $searchToastBox.prop("outerHTML");
-        const loadingHtmlContainerId = "loading-message-" + Date.now(); // or any unique logic
+        loadingHtmlContainerId = "loading-message-" + Date.now(); // or any unique logic
         $searchToastBox.attr("id", loadingHtmlContainerId);
         const loadingHtml = $searchToastBox.prop("outerHTML");
         console.log(loadingHtml)
 
 
         if (individualSearchResultContainerId) {
+            // alert(loadingHtmlContainerId)
             const $loadingElement = $(loadingHtml); // Convert string to jQuery element
             $loadingElement.css('margin-bottom', '32px'); // Apply CSS
             $(`#${individualSearchResultContainerId}`).replaceWith($loadingElement); // Replace
+
+            // KEEP LOADING ELEMENT ON THE TOP AFTER REPLACEMENT
+            // $(`#${loadingHtmlContainerId}`)[0].scrollIntoView(true);  // instant scroll - no animation/smoothness
+            $(`#${loadingHtmlContainerId}`)[0].scrollIntoView({
+                behavior: "smooth",  // Smooth animation
+                block: "start"       // Align to top
+            });
         }
         else{
             $('#search-results-container').append(loadingHtml).show();
         }
-
-
+        
         var settings = {
             "url": window.env.BASE_URL + "/api/search/",
             "method": "POST",
@@ -475,10 +617,11 @@ window.bindSearchHandler = function () {
                 renderSearchResults(mockResponse, loadingHtmlContainerId);
 
             } else {
-                $('#loading-message').remove();
+                // $('#loading-message').remove();
                 const $searchToastBox = $(searchToastBox.trim());
                 $searchToastBox.text("Search failed, please try again.")
-                $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
+                // $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
+                $(`#${loadingHtmlContainerId}`).replaceWith($searchToastBox.prop("outerHTML"));
             }
 
             $('#search-results-container').css('margin-bottom', "150px");
@@ -537,7 +680,8 @@ window.bindSearchHandler = function () {
 
                 const $searchToastBox = $(searchToastBox.trim());
                 $searchToastBox.text("Search aborted.");
-                $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
+                // $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
+                $(`#${loadingHtmlContainerId}`).replaceWith($searchToastBox.prop("outerHTML"));
             }
             return;
         }
@@ -562,6 +706,7 @@ window.bindSearchHandler = function () {
         $("#ai_search").focus();
         $(".main-logo").addClass("hidden");
         $("#footer").addClass("hidden");
+        $("#dummy-footer").removeClass("hidden");
         $("#search-form").css({ "position": "fixed", "bottom": "-20px" });
         // $("#ai_search").attr("placeholder", "Inquire Further, Ask Another Question");
         $("#ai_search").attr("data-placeholder", "Inquire Further, Ask Another Question");
@@ -579,6 +724,7 @@ window.bindSearchHandler = function () {
             const $searchToastBox = $(searchToastBox.trim());
             $searchToastBox.text("Please log in to perform a search.");
             $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
+            $('#search-form-btn i').addClass('fa-arrow-right').removeClass('fa-stop');
             return;
         }
 

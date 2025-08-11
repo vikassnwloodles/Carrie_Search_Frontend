@@ -76,6 +76,10 @@
         /* scroll-behavior: smooth; */
         /* } */
 
+        #search-results-container {
+            margin-bottom: 150px;
+        }
+
         #search-results-container::-webkit-scrollbar {
             width: 8px;
         }
@@ -168,7 +172,8 @@
 
         [contenteditable][data-placeholder]:empty:before {
             content: attr(data-placeholder);
-            color: #9ca3af; /* Tailwind gray-400 */
+            color: #9ca3af;
+            /* Tailwind gray-400 */
             pointer-events: none;
         }
 
@@ -321,9 +326,9 @@
 
             <!-- Top nav -->
             <div>
-                <div class="flex flex-col items-center mb-8">
+                <!-- <div class="flex flex-col items-center mb-8">
                     <span class="text-2xl font-bold text-gray-700">P</span>
-                </div>
+                </div> -->
                 <nav class="flex flex-col space-y-4 items-center">
                     <!-- <a href="#home" -->
                     <a href="javascript:void(0)"
@@ -331,15 +336,21 @@
                         title="Home">
                         <i class="fas fa-home text-xl"></i>
                     </a>
-                    <a href="javascript:void(0)"
+                    <!-- <a href="javascript:void(0)"
                         class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-600"
                         title="Discover">
                         <i class="fas fa-compass text-xl"></i>
-                    </a>
-                    <a href="javascript:void(0)"
+                    </a> -->
+                    <!-- <a href="javascript:void(0)"
                         class="to-home w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-600"
                         title="New Chat">
                         <i class="fas fa-plus text-xl"></i>
+                    </a> -->
+                    <a href="javascript:void(0)"
+                        id="library-link"
+                        class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-600"
+                        title="New Chat">
+                        <i class="fas fa-history text-xl"></i>
                     </a>
                 </nav>
             </div>
@@ -476,95 +487,71 @@
 
                         <h2 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Update Profile</h2>
 
-                        <form id="profile-update-form" class="space-y-4 text-sm">
-
-                            <!-- Personal Info -->
+                        <form id="profile-update-form" class="space-y-4 text-sm" x-data="{
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'email@example.com',
+    phone: '(123) 456-7890'
+}">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input type="text" placeholder="First Name" value="John" id="first_name"
-                                    class="w-full border border-gray-300 px-3 py-2 rounded-md" />
-                                <input type="text" placeholder="Last Name" value="Doe" id="last_name"
-                                    class="w-full border border-gray-300 px-3 py-2 rounded-md" />
-                                <input type="text" placeholder="Date of Birth (YYYY/MM/DD)" id="date_of_birth"
-                                    class="w-full border border-gray-300 px-3 py-2 rounded-md" />
-                                <select class="w-full border border-gray-300 px-3 py-2 rounded-md" id="gender">
-                                    <option value="">Select Gender</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="non-binary">Non-binary</option>
-                                    <option value="prefer-not-say">Prefer not to say</option>
-                                </select>
-                                <input type="text" placeholder="Preferred Pronouns (e.g., She/Her)"
-                                    id="preferred_pronouns"
-                                    class="w-full border border-gray-300 px-3 py-2 rounded-md" />
-                                <input type="email" placeholder="Email Address *" value="email@example.com" id="email"
-                                    class="w-full border border-gray-300 px-3 py-2 rounded-md" />
-                                <input type="text" placeholder="Mobile Phone Number" value="(123) 456-7890"
-                                    id="mobile_phone_number"
-                                    class="w-full border border-gray-300 px-3 py-2 rounded-md" />
-                                <input type="text" placeholder="Home Address" value="123 Main St, Anytown, CA 12345"
-                                    id="home_address"
-                                    class="w-full md:col-span-2 border border-gray-300 px-3 py-2 rounded-md" />
+                                <!-- First Name -->
+                                <div class="relative mt-4">
+                                    <input type="text" id="first_name" x-model="firstName" required
+                                        class="peer w-full border border-gray-300 px-3 pt-5 pb-2 rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                        placeholder="First Name" />
+                                    <label for="first_name" class="absolute left-3 -top-2.5 bg-white px-1 text-gray-500 text-xs transition-all
+                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
+                    peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-teal-600">
+                                        First Name
+                                    </label>
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="relative mt-4">
+                                    <input type="text" id="last_name" x-model="lastName" required
+                                        class="peer w-full border border-gray-300 px-3 pt-5 pb-2 rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                        placeholder="Last Name" />
+                                    <label for="last_name" class="absolute left-3 -top-2.5 bg-white px-1 text-gray-500 text-xs transition-all
+                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
+                    peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-teal-600">
+                                        Last Name
+                                    </label>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="relative mt-4">
+                                    <input type="email" id="email" x-model="email" required
+                                        class="peer w-full border border-gray-300 px-3 pt-5 pb-2 rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                        placeholder="Email Address" />
+                                    <label for="email" class="absolute left-3 -top-2.5 bg-white px-1 text-gray-500 text-xs transition-all
+                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
+                    peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-teal-600">
+                                        Email Address
+                                    </label>
+                                </div>
+
+                                <!-- Mobile Phone Number -->
+                                <div class="relative mt-4">
+                                    <input type="text" id="mobile_phone_number" x-model="phone" required
+                                        class="peer w-full border border-gray-300 px-3 pt-5 pb-2 rounded-md placeholder-transparent focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                        placeholder="Mobile Phone Number" />
+                                    <label for="mobile_phone_number" class="absolute left-3 -top-2.5 bg-white px-1 text-gray-500 text-xs transition-all
+                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
+                    peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-teal-600">
+                                        Mobile Phone Number
+                                    </label>
+                                </div>
                             </div>
 
-                            <!-- Demographics -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <select class="w-full border border-gray-300 px-3 py-2 rounded-md" id="race_ethnicity">
-                                    <option value="">Race/Ethnicity</option>
-                                    <option value="american-indian">American Indian or Alaska Native</option>
-                                    <option value="asian">Asian</option>
-                                    <option value="black">Black or African American</option>
-                                    <option value="hispanic">Hispanic or Latino</option>
-                                    <option value="white">White</option>
-                                    <option value="pacific-islander">Native Hawaiian or Other Pacific Islander</option>
-                                    <option value="two-or-more">Two or More Races</option>
-                                    <option value="other">Other</option>
-                                    <option value="not-disclose">Prefer not to disclose</option>
-                                </select>
-                                <select class="w-full border border-gray-300 px-3 py-2 rounded-md"
-                                    id="household_income_range">
-                                    <option value="">Household Income Range</option>
-                                    <option value="0-25k">Less than $25,000</option>
-                                    <option value="25k-50k">$25,000 - $49,999</option>
-                                    <option value="50k-75k">$50,000 - $74,999</option>
-                                    <option value="75k-100k">$75,000 - $99,999</option>
-                                    <option value="100k+">$100,000 or more</option>
-                                </select>
-                                <select class="w-full border border-gray-300 px-3 py-2 rounded-md" id="marital_status">
-                                    <option value="">Marital Status</option>
-                                    <option value="single">Single</option>
-                                    <option value="married">Married</option>
-                                    <option value="divorced">Divorced</option>
-                                    <option value="widowed">Widowed</option>
-                                </select>
-                                <input type="number" placeholder="Number of People in Household"
-                                    id="number_of_people_in_household"
-                                    class="w-full border border-gray-300 px-3 py-2 rounded-md" />
-                            </div>
-
-                            <div class="space-y-1">
-                                <label class="flex items-center space-x-2">
-                                    <input type="checkbox" id="is_employed" />
-                                    <span>Are you currently employed?</span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                    <input type="checkbox" id="is_student" />
-                                    <span>Are you a student?</span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                    <input type="checkbox" id="has_computer_or_internet" />
-                                    <span>Do you currently have access to a computer or internet at home?</span>
-                                </label>
-                            </div>
-
-                            <!-- Submit -->
+                            <!-- Submit Button -->
                             <div class="text-center pt-2">
                                 <button type="submit" id="profile-update-btn"
                                     class="bg-teal-600 text-white px-6 py-2 rounded-md hover:bg-teal-700">
                                     Update Profile
                                 </button>
                             </div>
-
                         </form>
+
                     </div>
                 </div>
 
@@ -605,7 +592,7 @@
 
         </aside>
 
-        <aside id="secondary-sidebar"
+        <!-- <aside id="secondary-sidebar"
             class="absolute left-20 top-0 w-64 h-full bg-gray-100 border-r border-gray-200 p-6 z-10">
             <h3 class="text-lg font-semibold text-gray-800 mb-6">Explore</h3>
             <nav class="flex flex-col space-y-2">
@@ -615,7 +602,7 @@
                 <a href="#" id="library-link"
                     class="p-3 rounded-lg hover:bg-gray-200 text-gray-700 font-medium">Library</a>
             </nav>
-        </aside>
+        </aside> -->
 
         <main id="main-content-area" class="flex-1 flex flex-col">
 
@@ -692,6 +679,10 @@
                     <img class="w-32 h-auto" src="assets/images/efamilies_logo.jpg" alt="efamilies_logo">
                     <img class="w-32 h-auto" src="assets/images/carrie_logo.jpg" alt="carrie_logo">
                 </div>
+            </footer>
+
+            <!-- DUMMY FOOTER FOR PROVIDING MARGIN AT BOTTOM -->
+            <footer id="dummy-footer" class="hidden" style="height:136px">
             </footer>
 
 
