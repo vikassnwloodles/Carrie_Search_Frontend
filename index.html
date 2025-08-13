@@ -346,8 +346,7 @@
                         title="New Chat">
                         <i class="fas fa-plus text-xl"></i>
                     </a> -->
-                    <a href="javascript:void(0)"
-                        id="library-link"
+                    <a href="javascript:void(0)" id="library-link"
                         class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-600"
                         title="New Chat">
                         <i class="fas fa-history text-xl"></i>
@@ -806,7 +805,88 @@
     <script src="assets/js/config.js"></script>
     <script type="module" src="assets/js/index.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turndown/7.1.2/turndown.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
+
     <script>
+
+        function handleChatExportAsDocx(uniqueId) {
+            // // Get the HTML content from the div
+            // const content = document.getElementById(`individual-search-result-${uniqueId}`).innerHTML;
+
+            // // Wrap the content in a full HTML document structure
+            // const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><//head><body>${content}<//body><//html>`;
+
+            const htmlCollection = document.getElementsByClassName(`text-container-${uniqueId}`);
+            const htmlContent1 = htmlCollection[0]; // pick the first matching element
+            const htmlContent2 = document.getElementById(`response-text-${uniqueId}`);
+            const turndownService = new TurndownService();
+
+            // Combine innerHTML of both elements into one string
+            const combinedHtml = (htmlContent1?.innerHTML || '') + (htmlContent2?.innerHTML || '');
+
+            // Convert the HTML string to a DOCX Blob
+            const docxBlob = htmlDocx.asBlob(combinedHtml);
+
+            // Create a download link for the Blob
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(docxBlob);
+            a.download = 'document.docx'; // Set the filename
+
+            // Append the link to the body, click it, and then remove it
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function handleChatExportAsMarkdown(uniqueId) {
+            const htmlCollection = document.getElementsByClassName(`text-container-${uniqueId}`);
+            const htmlContent1 = htmlCollection[0]; // pick the first matching element
+            const htmlContent2 = document.getElementById(`response-text-${uniqueId}`);
+            const turndownService = new TurndownService();
+
+            // Combine innerHTML of both elements into one string
+            const combinedHtml = (htmlContent1?.innerHTML || '') + (htmlContent2?.innerHTML || '');
+
+            // Convert HTML to Markdown string
+            const markdownString = turndownService.turndown(combinedHtml);
+
+            // Create a Blob from the Markdown string
+            const blob = new Blob([markdownString], { type: 'text/markdown' });
+
+            // Create a temporary link element
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'document.md'; // Specify the filename
+
+            // Trigger the download
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up the temporary link
+            document.body.removeChild(a);
+        }
+
+        function handleChatExportAsPDF(uniqueId) {
+            setTimeout(() => {
+                // Code to run after delay
+                const element = document.getElementById(`individual-search-result-${uniqueId}`);
+
+                html2pdf(element, {
+                    margin: 10,
+                    filename: 'document.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                });
+            }, 200); // delay in milliseconds (200ms = .2 second)
+        }
+
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
 

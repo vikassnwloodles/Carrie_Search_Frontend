@@ -27,9 +27,89 @@ window.bindSearchHandler = function () {
     function renderSearchResults(data, loadingHtmlContainerId = null) {
         const uniqueId = Date.now() + Math.floor(Math.random() * 1000); // ensure uniqueness
         const withLineBreaks = data.query.replace(/\n/g, "<br>");
-        let resultsHtml = `<div id="individual-search-result-${uniqueId}" class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200">
+        let resultsHtml = `<div id="individual-search-result-${uniqueId}" class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200 relative">
                 <!-- <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2> -->
-<!-- Main container -->
+
+                            <div
+                                class="absolute bottom-0 left-0 flex space-x-2 opacity-100 group-hover:opacity-100 transition-opacity duration-200">
+
+            <div class="" x-data="{ dropdownOpen: false, modalOpen: false, profileModal: false, changePasswordModal: false }" @close-profile-modal.window="profileModal = false" @close-change-password-modal.window="changePasswordModal = false">
+
+                <button @click="dropdownOpen = !dropdownOpen" class="relative flex items-center space-x-2 focus:outline-none">
+                                <!-- Export Icon -->
+                                <div class="relative group/export">
+                                    <div id="chat-export-icon-1755018910435"
+                                        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer">
+                                        <i class="fas fa-file-export"></i>
+                                    </div>
+                                    <div id="query-copy-tooltip-1755018910435"
+                                        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/export:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                        Export
+                                    </div>
+                                </div>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div x-data="{ loadingManagePlan: false }" x-show="dropdownOpen" @click.away="dropdownOpen = false" @set-loading.window="loadingManagePlan = true" @unset-loading.window="loadingManagePlan = false" id="dropdown-menu" class="absolute bottom-10 left-0 w-45 bg-white border border-gray-200 rounded-lg shadow-xl z-50" style="display: none;">
+                    <!-- EXPORT PDF -->
+                    <a href="javascript:void(0)" @click="dropdownOpen = false" onclick="handleChatExportAsPDF('${uniqueId}')" class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 text-gray-700 text-sm">
+                        <i class="fas fa-file-pdf text-indigo-500"></i>
+                        <span>PDF</span>
+                    </a>
+
+                    <!-- EXPORT MARKDOWN -->
+                    <a href="javascript:void(0)" @click="dropdownOpen = false" onclick="handleChatExportAsMarkdown('${uniqueId}')" class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 text-gray-700 text-sm">
+                        <i class="fas fa-file-code text-orange-500"></i>
+                        <span>Markdown</span>
+                    </a>
+
+                    <!-- EXPORT DOCX -->
+                    <a href="javascript:void(0)" @click="dropdownOpen = false" onclick="handleChatExportAsDocx('${uniqueId}')" class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 text-gray-700 text-sm">
+                        <i class="fas fa-file-word text-blue-500"></i>
+                        <span>DOCX</span>
+                    </a>
+                </div>
+            </div>
+
+                                <!-- Edit Icon -->
+                                <div class="relative group/edit">
+                                    <div id="query-edit-icon-1755018910435"
+                                        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-gray-600 text-xl hover:text-blue-600 transition-colors cursor-pointer">
+                                        <i class="far fa-edit"></i>
+                                    </div>
+                                    <div
+                                        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                        Edit text
+                                    </div>
+                                </div>
+
+
+                                <!-- Confirm (Tick) Icon -->
+                                <div id="confirm-edit-1755018910435" class="relative group/icon hidden">
+                                    <div
+                                        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-green-700 text-xl transition-colors cursor-pointer">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div id="query-copy-tooltip-1755018910435"
+                                        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                        Confirm
+                                    </div>
+                                </div>
+
+                                <!-- Cancel (Cross) Icon -->
+                                <div id="cancel-edit-1755018910435" class="relative group/edit hidden">
+                                    <div
+                                        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-red-700 text-xl transition-colors cursor-pointer">
+                                        <i class="fas fa-times"></i>
+                                    </div>
+                                    <div
+                                        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                        Cancel
+                                    </div>
+                                </div>
+                            </div>
+
+                <!-- Main container -->
 <div id="text-container-${uniqueId}" class="w-full border border-gray-200 bg-white rounded-xl pl-4 pt-4 pb-8 pr-2 mb-8 group relative">
 
   <!-- Text content -->
@@ -49,85 +129,6 @@ window.bindSearchHandler = function () {
       >
         ${withLineBreaks}
       </strong>
-      <script>
-
-      function handleOnQueryPaste(e, localUniqueId) {
-    e.preventDefault();
-
-    const text = (e.originalEvent || e).clipboardData.getData('text/plain');
-    const html = text.replace(/\\n/g, '<br>');
-    document.execCommand('insertHTML', false, html);
-    requestAnimationFrame(() => scrollToBottom(document.getElementById('query-text-'+localUniqueId)));
-
-    const textContainer = $('.text-container-'+localUniqueId);
-    console.log('.text-container-'+localUniqueId)
-    let distanceFromTop = textContainer.offset().top;
-    let viewportHeight = $(window).height();
-    let remainingViewportHeight = viewportHeight - distanceFromTop;
-    let viewportVerticalOffsetForEditQuery = $('#search-form').outerHeight(true) + 46;
-
-    textContainer.css("max-height", "none");
-    const actualHeight = textContainer[0].scrollHeight;
-
-    if (actualHeight > (remainingViewportHeight - viewportVerticalOffsetForEditQuery)) {
-        $('#dynamic-content-container')[0].scrollTop += 
-            (actualHeight - (remainingViewportHeight - viewportVerticalOffsetForEditQuery));
-    }
-}
-
-      function handleOnQueryDrop(e, localUniqueId) {
-    e.preventDefault();
-
-    const text = (e.originalEvent || e).dataTransfer.getData('text/plain');
-    const html = text.replace(/\\n/g, '<br>');
-    document.execCommand('insertHTML', false, html);
-    requestAnimationFrame(() => scrollToBottom(document.getElementById('query-text-'+localUniqueId)));
-
-    const textContainer = $('.text-container-'+localUniqueId);
-    console.log('.text-container-'+localUniqueId)
-    let distanceFromTop = textContainer.offset().top;
-    let viewportHeight = $(window).height();
-    let remainingViewportHeight = viewportHeight - distanceFromTop;
-    let viewportVerticalOffsetForEditQuery = $('#search-form').outerHeight(true) + 46;
-
-    textContainer.css("max-height", "none");
-    const actualHeight = textContainer[0].scrollHeight;
-
-    if (actualHeight > (remainingViewportHeight - viewportVerticalOffsetForEditQuery)) {
-        $('#dynamic-content-container')[0].scrollTop += 
-            (actualHeight - (remainingViewportHeight - viewportVerticalOffsetForEditQuery));
-    }
-}
-
-
-      
-function placeCaretAtEnd(el) {
-  if (!el) return;
-  // Create range and move caret to end
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  range.collapse(false); // move to end
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
-}
-            //function handleQueryContainerFocus(el) {
-            //console.log(el)
-            //    $('#text-container-${uniqueId}').addClass('ring-2 ring-blue-500');
-            //}
-            //function handleQueryContainerBlur(el) {
-            //    $('#text-container-${uniqueId}').removeClass('ring-2', 'ring-blue-500');
-            //}
-
-            function handleQueryContainerFocus(el) {
-    // Find closest ancestor div with id starting with "text-container-"
-    $(el).closest('div[id^="text-container-"]').addClass('ring-2 ring-blue-500');
-}
-
-function handleQueryContainerBlur(el) {
-    $(el).closest('div[id^="text-container-"]').removeClass('ring-2 ring-blue-500');
-}
-      </script>
       </p>
   </div>
 
@@ -186,121 +187,6 @@ function handleQueryContainerBlur(el) {
 
   </div>
 
-  <!-- JS for Copy and Edit Functionality -->
-  <script>
-    const $queryCopyTooltip_${uniqueId} = $('#query-copy-tooltip-${uniqueId}');
-    const $text_${uniqueId} = $('#query-text-${uniqueId}');
-    const $edit_${uniqueId} = $('#query-edit-icon-${uniqueId}');
-    const $confirm_${uniqueId} = $('#confirm-edit-${uniqueId}');
-    const $cancel_${uniqueId} = $('#cancel-edit-${uniqueId}');
-    const $copy_${uniqueId} = $('#query-copy-icon-${uniqueId}');
-    const originalText_${uniqueId} = $text_${uniqueId}.html(); // Preserve original
-
-    $copy_${uniqueId}.on('click', function () {
-      const textHtml = $text_${uniqueId}.html()
-        .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '')
-        .replace(/<br\\s*\\/?>/gi, '\\n')
-        .replace(/<\\/p>/gi, '\\n\\n')
-        .replace(/<\\/li>/gi, '\\n')
-        .replace(/<\\/ul>/gi, '\\n')
-        .replace(/<\\/ol>/gi, '\\n')
-        .replace(/<hr\\b[^>]*\\/?>/gi, '\\n');
-
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = textHtml;
-      const textToCopy = tempDiv.textContent.trim();
-
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        $queryCopyTooltip_${uniqueId}.text('Copied!');
-        setTimeout(() => $queryCopyTooltip_${uniqueId}.text('Copy to clipboard'), 1500);
-      }).catch(() => {
-        $queryCopyTooltip_${uniqueId}.text('Failed to copy');
-        setTimeout(() => $queryCopyTooltip_${uniqueId}.text('Copy to clipboard'), 1500);
-      });
-    });
-
-$edit_${uniqueId}.on('click', function (e) {
-  e.preventDefault();
-  e.stopPropagation();
-
-  expanded = true;
-  $('.text-container-${uniqueId}').css('max-height', 'none');
-
-  $edit_${uniqueId}.hide();
-  $copy_${uniqueId}.hide();
-  $confirm_${uniqueId}.show();
-  $cancel_${uniqueId}.show();
-
-  // Make editable first
-  $text_${uniqueId}.attr('contenteditable', true);
-
-  // Apply the same highlight ring behavior here
-  // handleQueryContainerFocus($text_${uniqueId}[0]);
-
-  // Focus without scroll jump
-  try {
-    $text_${uniqueId}[0].focus({ preventScroll: true });
-  } catch {
-    $text_${uniqueId}[0].focus();
-  }
-
-  // Move caret to end after focus settles
-  requestAnimationFrame(() => {
-    placeCaretAtEnd($text_${uniqueId}[0]);
-  });
-});
-
-
-    $confirm_${uniqueId}.on('click', function (event) {
-    const el = event.currentTarget;
-      console.log(el)
-      $text_${uniqueId}.attr('contenteditable', false);
-      $confirm_${uniqueId}.hide();
-      $cancel_${uniqueId}.hide();
-      $edit_${uniqueId}.show();
-
-      const textHtml = $text_${uniqueId}.html()
-        .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '')
-        // .replace(/<br\\s*\\/?>/gi, '\\n')
-        .replace(/<br[^>]*>/gi, '\\n')
-        .replace(/<\\/p>/gi, '\\n\\n')
-        .replace(/<\\/li>/gi, '\\n')
-        .replace(/<\\/ul>/gi, '\\n')
-        .replace(/<\\/ol>/gi, '\\n')
-        .replace(/<hr\\b[^>]*\\/?>/gi, '\\n');
-
-      console.log(textHtml)
-
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = textHtml;
-      const textToSend = tempDiv.textContent.trim();
-      
-    const resultDiv = el.closest('div[id^="individual-search-result-"]');
-    if (resultDiv) {
-        console.log('Found parent ID:', resultDiv.id);
-
-        const token = localStorage.getItem('accessToken');
-        var form = new FormData();
-        form.append('prompt', textToSend);
-        form.append('return_images', true);
-        searchAjax(form, token, resultDiv.id);
-
-    } else {
-        console.log('No matching parent found.');
-    }
-
-    });
-
-    $cancel_${uniqueId}.on('click', function () {
-      $text_${uniqueId}.html(originalText_${uniqueId});
-      $text_${uniqueId}.attr('contenteditable', false);
-      $confirm_${uniqueId}.hide();
-      $cancel_${uniqueId}.hide();
-      $edit_${uniqueId}.show();
-      $copy_${uniqueId}.show();
-    });
-  </script>
-
                       <!-- Toggle button -->
                     <button id="toggle-btn"
                         class="absolute bottom-0 toggle-btn-${uniqueId} text-teal-600 flex items-center gap-1 hover:underline focus:outline-none">
@@ -313,62 +199,6 @@ $edit_${uniqueId}.on('click', function (e) {
                     </button>
 
 </div>
-
-                    <script>
-                    (function () {
-                        const textContainer = $('.text-container-${uniqueId}');
-                        const toggleBtn = $('.toggle-btn-${uniqueId}');
-                        let expanded = false;
-
-                        // Temporarily expand to check actual height
-                        textContainer.css("max-height", "none");
-                        const actualHeight = textContainer[0].scrollHeight;
-                        console.log(actualHeight)
-                        textContainer.css("max-height", "120px");
-
-                        if (actualHeight <= 120) {
-                        toggleBtn.hide(); // Hide toggle if content doesn't overflow
-                        } else {
-                        toggleBtn.show(); // Ensure toggle is visible if needed
-                        }
-
-                        toggleBtn.add($('#query-edit-icon-${uniqueId}')).add($('#cancel-edit-${uniqueId}')).on('click', function (e) {
-
-                        if (expanded === false){
-                            if (!$(e.currentTarget).is('#cancel-edit-${uniqueId}')) {
-                                expanded = true
-                                if($(e.currentTarget).is('#query-edit-icon-${uniqueId}')){
-                                    let distanceFromTop = $('.text-container-${uniqueId}').offset().top;
-                                    let viewportHeight = $(window).height();
-                                    let remainingViewportHeight = viewportHeight - distanceFromTop
-
-                                    let viewportVerticalOffsetForEditQuery = $('#search-form').outerHeight(true) + 46
-                                    if (actualHeight > (remainingViewportHeight-viewportVerticalOffsetForEditQuery)){
-                                        // alert("some portion of query box is out of viewport")
-                                        $('#dynamic-content-container')[0].scrollTop += (actualHeight - (remainingViewportHeight-viewportVerticalOffsetForEditQuery));
-                                    }
-                                }
-                            }
-                        }
-                        else{
-                            if (!$(e.currentTarget).is('#query-edit-icon-${uniqueId}')) {
-                                expanded = false
-                                if(($('#individual-search-result-${uniqueId}').offset().top - 88) < 0){
-                                    $('#individual-search-result-${uniqueId}')[0].scrollIntoView(true);
-                                }
-                            }
-                        }
-
-                        // textContainer.css("max-height", expanded ? "1000px" : "120px");
-                        textContainer.css("max-height", expanded ? "none" : "120px");
-                        const iconPath = expanded
-                            ? "M19 15l-7-7-7 7"
-                            : "M19 9l-7 7-7-7";
-                        $('.toggle-path-${uniqueId}').attr("d", iconPath);
-                        $('.toggle-text-${uniqueId}').text(expanded ? "Show less" : "Show more");
-                        });
-                    })();
-                    </script>
 
                 <!-- </div> -->
                 <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"> -->
@@ -383,19 +213,21 @@ $edit_${uniqueId}.on('click', function (e) {
         // });
 
         // resultsHtml += `</div>`;
-        if (data.links && data.links.length > 0) {
-            resultsHtml += `<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">`;
 
-            data.links.forEach(link => {
-                resultsHtml += `
-            <div class="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
-                <h3 class="font-semibold text-teal-700">${link.title}</h3>
-                <a href="${link.url}" target="_blank" class="text-sm text-gray-500 truncate block">${link.url}</a>
-            </div>`;
-            });
 
-            resultsHtml += `</div>`;
-        }
+        // if (data.links && data.links.length > 0) {
+        //     resultsHtml += `<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">`;
+
+        //     data.links.forEach(link => {
+        //         resultsHtml += `
+        //     <div class="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+        //         <h3 class="font-semibold text-teal-700">${link.title}</h3>
+        //         <a href="${link.url}" target="_blank" class="text-sm text-gray-500 truncate block">${link.url}</a>
+        //     </div>`;
+        //     });
+
+        //     resultsHtml += `</div>`;
+        // }
 
         if (data.images && data.images.length > 0) {
             resultsHtml += `<h3 class="text-xl font-semibold mt-6 mb-4">Related Images:</h3>
@@ -465,7 +297,9 @@ $edit_${uniqueId}.on('click', function (e) {
                 </div>
             </div>
 
-            <script>
+            </div>
+            
+                        <script>
                 $('#copy-icon-${uniqueId}').on('click', function () {
                     console.log($('#response-text-${uniqueId}').html())
                     // const textHtml = $('#response-text-${uniqueId}').html().replace(/<br\\s*\\/?>/gi, '\\n').replace(/<\\/p>/gi, '\\n').replace(/<\\/li>/gi, '\\n');
@@ -493,8 +327,252 @@ $edit_${uniqueId}.on('click', function (e) {
                         setTimeout(() => $resultCopyTooltip_${uniqueId}.text('Copy to clipboard'), 1500);
                     });
                 });
-            </script>
-            </div>`;
+
+                function handleOnQueryPaste(e, localUniqueId) {
+                    e.preventDefault();
+
+                    const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+                    const html = text.replace(/\\n/g, '<br>');
+                    document.execCommand('insertHTML', false, html);
+                    requestAnimationFrame(() => scrollToBottom(document.getElementById('query-text-' + localUniqueId)));
+
+                    const textContainer = $('.text-container-' + localUniqueId);
+                    console.log('.text-container-' + localUniqueId)
+                    let distanceFromTop = textContainer.offset().top;
+                    let viewportHeight = $(window).height();
+                    let remainingViewportHeight = viewportHeight - distanceFromTop;
+                    let viewportVerticalOffsetForEditQuery = $('#search-form').outerHeight(true) + 46;
+
+                    textContainer.css("max-height", "none");
+                    const actualHeight = textContainer[0].scrollHeight;
+
+                    if (actualHeight > (remainingViewportHeight - viewportVerticalOffsetForEditQuery)) {
+                        $('#dynamic-content-container')[0].scrollTop +=
+                            (actualHeight - (remainingViewportHeight - viewportVerticalOffsetForEditQuery));
+                    }
+                }
+
+                function handleOnQueryDrop(e, localUniqueId) {
+                    e.preventDefault();
+
+                    const text = (e.originalEvent || e).dataTransfer.getData('text/plain');
+                    const html = text.replace(/\\n/g, '<br>');
+                    document.execCommand('insertHTML', false, html);
+                    requestAnimationFrame(() => scrollToBottom(document.getElementById('query-text-' + localUniqueId)));
+
+                    const textContainer = $('.text-container-' + localUniqueId);
+                    console.log('.text-container-' + localUniqueId)
+                    let distanceFromTop = textContainer.offset().top;
+                    let viewportHeight = $(window).height();
+                    let remainingViewportHeight = viewportHeight - distanceFromTop;
+                    let viewportVerticalOffsetForEditQuery = $('#search-form').outerHeight(true) + 46;
+
+                    textContainer.css("max-height", "none");
+                    const actualHeight = textContainer[0].scrollHeight;
+
+                    if (actualHeight > (remainingViewportHeight - viewportVerticalOffsetForEditQuery)) {
+                        $('#dynamic-content-container')[0].scrollTop +=
+                            (actualHeight - (remainingViewportHeight - viewportVerticalOffsetForEditQuery));
+                    }
+                }
+
+
+
+                function placeCaretAtEnd(el) {
+                    if (!el) return;
+                    // Create range and move caret to end
+                    const range = document.createRange();
+                    range.selectNodeContents(el);
+                    range.collapse(false); // move to end
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+                //function handleQueryContainerFocus(el) {
+                //console.log(el)
+                //    $('#text-container-${uniqueId}').addClass('ring-2 ring-blue-500');
+                //}
+                //function handleQueryContainerBlur(el) {
+                //    $('#text-container-${uniqueId}').removeClass('ring-2', 'ring-blue-500');
+                //}
+
+                function handleQueryContainerFocus(el) {
+                    // Find closest ancestor div with id starting with "text-container-"
+                    $(el).closest('div[id^="text-container-"]').addClass('ring-2 ring-blue-500');
+                }
+
+                function handleQueryContainerBlur(el) {
+                    $(el).closest('div[id^="text-container-"]').removeClass('ring-2 ring-blue-500');
+                }
+
+                // JS for Copy and Edit Functionality
+                const $queryCopyTooltip_${uniqueId} = $('#query-copy-tooltip-${uniqueId}');
+                const $text_${uniqueId} = $('#query-text-${uniqueId}');
+                const $edit_${uniqueId} = $('#query-edit-icon-${uniqueId}');
+                const $confirm_${uniqueId} = $('#confirm-edit-${uniqueId}');
+                const $cancel_${uniqueId} = $('#cancel-edit-${uniqueId}');
+                const $copy_${uniqueId} = $('#query-copy-icon-${uniqueId}');
+                const originalText_${uniqueId} = $text_${uniqueId}.html(); // Preserve original
+
+                $copy_${uniqueId}.on('click', function () {
+                const textHtml = $text_${uniqueId}.html()
+                    .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '')
+                    .replace(/<br\\s*\\/?>/gi, '\\n')
+                    .replace(/<\\/p>/gi, '\\n\\n')
+                    .replace(/<\\/li>/gi, '\\n')
+                    .replace(/<\\/ul>/gi, '\\n')
+                    .replace(/<\\/ol>/gi, '\\n')
+                    .replace(/<hr\\b[^>]*\\/?>/gi, '\\n');
+
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = textHtml;
+                const textToCopy = tempDiv.textContent.trim();
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    $queryCopyTooltip_${uniqueId}.text('Copied!');
+                    setTimeout(() => $queryCopyTooltip_${uniqueId}.text('Copy to clipboard'), 1500);
+                }).catch(() => {
+                    $queryCopyTooltip_${uniqueId}.text('Failed to copy');
+                    setTimeout(() => $queryCopyTooltip_${uniqueId}.text('Copy to clipboard'), 1500);
+                });
+                });
+
+                $edit_${uniqueId}.on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                expanded = true;
+                $('.text-container-${uniqueId}').css('max-height', 'none');
+
+                $edit_${uniqueId}.hide();
+                $copy_${uniqueId}.hide();
+                $confirm_${uniqueId}.show();
+                $cancel_${uniqueId}.show();
+
+                // Make editable first
+                $text_${uniqueId}.attr('contenteditable', true);
+
+                // Apply the same highlight ring behavior here
+                // handleQueryContainerFocus($text_${uniqueId}[0]);
+
+                // Focus without scroll jump
+                try {
+                    $text_${uniqueId}[0].focus({ preventScroll: true });
+                } catch {
+                    $text_${uniqueId}[0].focus();
+                }
+
+                // Move caret to end after focus settles
+                requestAnimationFrame(() => {
+                    placeCaretAtEnd($text_${uniqueId}[0]);
+                });
+                });
+
+
+                $confirm_${uniqueId}.on('click', function (event) {
+                const el = event.currentTarget;
+                console.log(el)
+                $text_${uniqueId}.attr('contenteditable', false);
+                $confirm_${uniqueId}.hide();
+                $cancel_${uniqueId}.hide();
+                $edit_${uniqueId}.show();
+
+                const textHtml = $text_${uniqueId}.html()
+                    .replace(/<([a-z]+)[^>]*>(?:\\s|&nbsp;|\\u200B)*<\\/\\1>/gi, '')
+                    // .replace(/<br\\s*\\/?>/gi, '\\n')
+                    .replace(/<br[^>]*>/gi, '\\n')
+                    .replace(/<\\/p>/gi, '\\n\\n')
+                    .replace(/<\\/li>/gi, '\\n')
+                    .replace(/<\\/ul>/gi, '\\n')
+                    .replace(/<\\/ol>/gi, '\\n')
+                    .replace(/<hr\\b[^>]*\\/?>/gi, '\\n');
+
+                console.log(textHtml)
+
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = textHtml;
+                const textToSend = tempDiv.textContent.trim();
+                
+                const resultDiv = el.closest('div[id^="individual-search-result-"]');
+                if (resultDiv) {
+                    console.log('Found parent ID:', resultDiv.id);
+
+                    const token = localStorage.getItem('accessToken');
+                    var form = new FormData();
+                    form.append('prompt', textToSend);
+                    form.append('return_images', true);
+                    searchAjax(form, token, resultDiv.id);
+
+                } else {
+                    console.log('No matching parent found.');
+                }
+
+                });
+
+                $cancel_${uniqueId}.on('click', function () {
+                $text_${uniqueId}.html(originalText_${uniqueId});
+                $text_${uniqueId}.attr('contenteditable', false);
+                $confirm_${uniqueId}.hide();
+                $cancel_${uniqueId}.hide();
+                $edit_${uniqueId}.show();
+                $copy_${uniqueId}.show();
+                });
+
+                (function () {
+                    const textContainer = $('.text-container-${uniqueId}');
+                    const toggleBtn = $('.toggle-btn-${uniqueId}');
+                    let expanded = false;
+
+                    // Temporarily expand to check actual height
+                    textContainer.css("max-height", "none");
+                    const actualHeight = textContainer[0].scrollHeight;
+                    console.log(actualHeight)
+                    textContainer.css("max-height", "120px");
+
+                    if (actualHeight <= 120) {
+                        toggleBtn.hide(); // Hide toggle if content doesn't overflow
+                    } else {
+                        toggleBtn.show(); // Ensure toggle is visible if needed
+                    }
+
+                    toggleBtn.add($('#query-edit-icon-${uniqueId}')).add($('#cancel-edit-${uniqueId}')).on('click', function (e) {
+
+                        if (expanded === false) {
+                            if (!$(e.currentTarget).is('#cancel-edit-${uniqueId}')) {
+                                expanded = true
+                                if ($(e.currentTarget).is('#query-edit-icon-${uniqueId}')) {
+                                    let distanceFromTop = $('.text-container-${uniqueId}').offset().top;
+                                    let viewportHeight = $(window).height();
+                                    let remainingViewportHeight = viewportHeight - distanceFromTop
+
+                                    let viewportVerticalOffsetForEditQuery = $('#search-form').outerHeight(true) + 46
+                                    if (actualHeight > (remainingViewportHeight - viewportVerticalOffsetForEditQuery)) {
+                                        // alert("some portion of query box is out of viewport")
+                                        $('#dynamic-content-container')[0].scrollTop += (actualHeight - (remainingViewportHeight - viewportVerticalOffsetForEditQuery));
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            if (!$(e.currentTarget).is('#query-edit-icon-${uniqueId}')) {
+                                expanded = false
+                                if (($('#individual-search-result-${uniqueId}').offset().top - 88) < 0) {
+                                    $('#individual-search-result-${uniqueId}')[0].scrollIntoView(true);
+                                }
+                            }
+                        }
+
+                        // textContainer.css("max-height", expanded ? "1000px" : "120px");
+                        textContainer.css("max-height", expanded ? "none" : "120px");
+                        const iconPath = expanded
+                            ? "M19 15l-7-7-7 7"
+                            : "M19 9l-7 7-7-7";
+                        $('.toggle-path-${uniqueId}').attr("d", iconPath);
+                        $('.toggle-text-${uniqueId}').text(expanded ? "Show less" : "Show more");
+                    });
+                })();
+
+            </script>`;
 
         // if (individualSearchResultContainerId) {
         //     // Replace the specific individual result container inside the main container
