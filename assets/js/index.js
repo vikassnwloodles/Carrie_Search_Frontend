@@ -34,6 +34,7 @@ $(document).ready(function () {
     const event = urlParams.get('event');
     const uidb64 = urlParams.get('uidb64');
     const token = urlParams.get('token');
+    const sharedChatId = urlParams.get('shared-chat-id');
 
     (function () {
         const $appMessageContainer = $('#app-message-container');
@@ -41,6 +42,97 @@ $(document).ready(function () {
         if (event == "reset-password") {
             $('#resetPasswordModal').removeClass('invisible opacity-0').addClass('visible opacity-100');
         }
+
+        if (sharedChatId) {
+            // RENDER SPECIFIC SHARED CHAT ONLY
+            const authToken = localStorage.getItem('accessToken');
+            fetch(window.env.BASE_URL + '/api/public-chat/' + sharedChatId + '/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + authToken  // Replace with your token variable
+                },
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        const toastOptions = [{
+                            status_code: 401,
+                            title: "Unauthorized",
+                            message: "Please log in to access this URL",
+                            type: "error"
+                        }]
+                        showToast({ response, toastOptions })
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var links = [];
+                    var content = null;
+                    var images = [];
+                    var response = data.response
+
+                    if (response && response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
+                        var searchContent = response.choices[0].message.content;
+
+                        if (response.search_results) {
+                            for (let index = 0; index < response.search_results.length; index++) {
+                                const element = response.search_results[index];
+                                links.push({ title: element.title, url: element.url });
+                            }
+                        }
+
+
+                        if (response.images) {
+                            for (let index = 0; index < response.images.length; index++) {
+                                const img = response.images[index];
+                                images.push({ src: img.image_url, url: img.origin_url });
+                            }
+                        }
+
+                        content = structuredData(searchContent);
+
+                        const mockResponse = {
+                            query: data.prompt,
+                            links: links,
+                            images: images,
+                            content: content,
+                            search_result_id: response.id
+                        };
+                        const $searchToastBox = $(searchToastBox.trim());
+                        $searchToastBox.attr("id", "loading-message").text("Please standby, Pete is working to make your life and work easier...!")
+                        $searchToastBox.addClass("animate-fade-in text-gray-500").removeClass("text-red-500 mb-8")
+                        const dynamicHeight = $('#dynamic-content-container').height();
+                        const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());
+                        // $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');
+                        $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 150 + 'px');
+
+                        // const loadingHtml = $searchToastBox.prop("outerHTML");
+                        let loadingHtmlContainerId = "loading-message-" + Date.now(); // or any unique logic
+                        $searchToastBox.attr("id", loadingHtmlContainerId);
+                        const loadingHtml = $searchToastBox.prop("outerHTML");
+                        $('#search-results-container').append(loadingHtml).show();
+                        renderSearchResults(mockResponse, loadingHtmlContainerId);
+
+                        $(".main-logo").addClass("hidden");
+                        $("#footer").addClass("hidden");
+                        $("#dummy-footer").removeClass("hidden");
+                        $("#search-form").css({ "position": "fixed", "bottom": "-20px" });
+
+                    } else if (data.error) {
+                        const toastOptions = [{
+                            title: "Chat not found!",
+                            message: "",
+                            type: "warning"
+                        }]
+                        showToast({ toastOptions })
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Something went wrong while retrieving the chat.');
+                });
+        }
+
 
         if (sessionId) {
             localStorage.setItem('session_id', sessionId);

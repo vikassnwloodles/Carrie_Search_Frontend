@@ -815,6 +815,62 @@
 
     <script>
 
+        function handleShareChat(searchResultId, uniqueId) {
+            const authToken = localStorage.getItem('accessToken');
+            fetch(window.env.BASE_URL + '/api/make-chat-public/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + authToken  // Replace with your token variable
+                },
+                body: JSON.stringify({
+                    'search-result-id': searchResultId
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.shared_chat_id) {
+                        shareable_url = window.env.FRONTEND_BASE_URL + "/?shared-chat-id=" + data.shared_chat_id
+
+                        navigator.clipboard.writeText(shareable_url).then(() => {
+                            $(`#share-chat-tooltip-${uniqueId}`).text("Link copied. Paste to share");
+                            $(`#share-chat-tooltip-${uniqueId}`).removeClass("opacity-0").addClass("opacity-100");
+
+                            setTimeout(function () {
+                                $(`#share-chat-tooltip-${uniqueId}`).removeClass("opacity-100").addClass("opacity-0");
+                            }, 2000);
+                        }).catch(() => {
+                            $(`#share-chat-tooltip-${uniqueId}`).text("Failed to copy link for sharing");
+                            $(`#share-chat-tooltip-${uniqueId}`).removeClass("opacity-0").addClass("opacity-100");
+
+                            setTimeout(function () {
+                                $(`#share-chat-tooltip-${uniqueId}`).removeClass("opacity-100").addClass("opacity-0");
+                            }, 2000);
+                        });
+
+                        $(`#share-chat-tooltip-${uniqueId}`)
+                            .removeClass("opacity-0")
+                            .addClass("opacity-100");
+
+                        setTimeout(function () {
+                            $(`#share-chat-tooltip-${uniqueId}`)
+                                .removeClass("opacity-100")
+                                .addClass("opacity-0");
+                        }, 2000);
+
+                    } else if (data.message) {
+                        alert(data.message);
+                    } else if (data.error) {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Something went wrong while sharing the chat.');
+                });
+        }
+
         function handleChatExportAsDocx(uniqueId) {
             // // Get the HTML content from the div
             // const content = document.getElementById(`individual-search-result-${uniqueId}`).innerHTML;

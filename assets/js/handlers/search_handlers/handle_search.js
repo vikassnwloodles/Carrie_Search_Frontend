@@ -24,9 +24,11 @@ window.bindSearchHandler = function () {
     });
 
 
-    function renderSearchResults(data, loadingHtmlContainerId = null) {
+    window.renderSearchResults = function (data, loadingHtmlContainerId = null) {
+        console.log("BEFORE ERROR.........")
         const uniqueId = Date.now() + Math.floor(Math.random() * 1000); // ensure uniqueness
         const withLineBreaks = data.query.replace(/\n/g, "<br>");
+                                console.log("BEFORE ERROR.........")
         let resultsHtml = `<div id="individual-search-result-${uniqueId}" class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200 relative">
                 <!-- <h2 class="text-2xl font-bold mb-4">Results for: "${data.query}"</h2> -->
 
@@ -39,12 +41,9 @@ window.bindSearchHandler = function () {
                                 <!-- Export Icon -->
                                 <div class="relative group/export">
                                     <div id="chat-export-icon-1755018910435"
-                                        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer">
-                                        <i class="fas fa-file-export"></i>
-                                    </div>
-                                    <div id="query-copy-tooltip-1755018910435"
-                                        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/export:opacity-100 transition-opacity duration-200 pointer-events-none">
-                                        Export
+                                        class="flex items-center justify-center p-2 bg-white h-8 gap-1 rounded-md text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7999999999999998" stroke-linecap="round" stroke-linejoin="round" class="tabler-icon tabler-icon-file-export "><path d="M14 3v4a1 1 0 0 0 1 1h4"></path><path d="M11.5 21h-4.5a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v5m-5 6h7m-3 -3l3 3l-3 3"></path></svg>
+                                        <strong class="text-sm">Export</strong>
                                     </div>
                                 </div>
                 </button>
@@ -71,15 +70,17 @@ window.bindSearchHandler = function () {
                 </div>
             </div>
 
-                                <!-- Edit Icon -->
+                                <!-- Share Icon -->
                                 <div class="relative group/edit">
-                                    <div id="query-edit-icon-1755018910435"
-                                        class="flex items-center justify-center p-2 bg-white border h-8 w-8 rounded-md text-gray-600 text-xl hover:text-blue-600 transition-colors cursor-pointer">
-                                        <i class="far fa-edit"></i>
-                                    </div>
                                     <div
-                                        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover/edit:opacity-100 transition-opacity duration-200 pointer-events-none">
-                                        Edit text
+                                        onclick="handleShareChat('${data.search_result_id}', '${uniqueId}')"
+                                        class="flex items-center justify-center p-2 bg-white h-8 gap-1 rounded-md text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7999999999999998" stroke-linecap="round" stroke-linejoin="round" class="tabler-icon tabler-icon-share-3 "><path d="M13 4v4c-6.575 1.028 -9.02 6.788 -10 12c-.037 .206 5.384 -5.962 10 -6v4l8 -7l-8 -7z"></path></svg>
+                                        <strong class="text-sm">Share</strong>
+                                    </div>
+                                    <div id="share-chat-tooltip-${uniqueId}"
+                                        class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 transition-opacity duration-200 pointer-events-none z-[999]">
+                                        Link copied. Paste to share
                                     </div>
                                 </div>
 
@@ -228,7 +229,7 @@ window.bindSearchHandler = function () {
 
         //     resultsHtml += `</div>`;
         // }
-
+                        console.log("BEFORE ERROR.........")
         if (data.images && data.images.length > 0) {
             resultsHtml += `<h3 class="text-xl font-semibold mt-6 mb-4">Related Images:</h3>
                                 <div class="image-carousel-wrapper">
@@ -279,22 +280,25 @@ window.bindSearchHandler = function () {
 
 
         // const uniqueId = Date.now(); // or use a counter if multiple results load quickly
-
+                        console.log("BEFORE ERROR.........")
         resultsHtml += `
-            <div id="response-text-${uniqueId}" class="bg-white p-6 rounded-lg border border-gray-200 mb-4">
+            <div id="response-text-${uniqueId}" class="bg-white p-6 rounded-lg border border-gray-200 mb-4 relative">
+            <div
+    class="absolute bottom-0 right-0 flex space-x-2 opacity-100 group-hover:opacity-100 transition-opacity duration-200">
+    <!-- Copy Icon -->
+    <div class="relative group">
+        <div id="copy-icon-${uniqueId}"
+            class="flex items-center justify-center p-2 bg-white border h-8 gap-1 rounded-md text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer">
+            <i class="far fa-copy"></i>
+        </div>
+        <!-- Tooltip -->
+        <div id="result-copy-tooltip-${uniqueId}"
+            class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            Copy to clipboard
+        </div>
+    </div>
+</div>
                 <p>${data.content}</p>
-            </div>
-
-            <div class="relative flex items-center justify-end mt-4 group">
-                <!-- Copy Icon -->
-                <i id="copy-icon-${uniqueId}"
-                class="far fa-copy text-gray-600 text-xl hover:text-teal-600 transition-colors cursor-pointer"></i>
-
-                <!-- Tooltip -->
-                <div id="result-copy-tooltip-${uniqueId}"
-                    class="absolute bottom-full mb-2 right-0 w-max bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                    Copy to clipboard
-                </div>
             </div>
 
             </div>
@@ -557,7 +561,9 @@ window.bindSearchHandler = function () {
                             if (!$(e.currentTarget).is('#query-edit-icon-${uniqueId}')) {
                                 expanded = false
                                 if (($('#individual-search-result-${uniqueId}').offset().top - 88) < 0) {
+                                    console.log("BEFORE ERROR.........")
                                     $('#individual-search-result-${uniqueId}')[0].scrollIntoView(true);
+                                    console.log("AFTER ERROR.........")
                                 }
                             }
                         }
@@ -573,7 +579,7 @@ window.bindSearchHandler = function () {
                 })();
 
             </script>`;
-
+                        console.log("BEFORE ERROR.........")
         // if (individualSearchResultContainerId) {
         //     // Replace the specific individual result container inside the main container
         //     $('#' + individualSearchResultContainerId).replaceWith(resultsHtml);
@@ -582,14 +588,14 @@ window.bindSearchHandler = function () {
         //     $('#search-results-container').append(resultsHtml).show();
         // }
         $(`#${loadingHtmlContainerId}`).replaceWith(resultsHtml);
-        
+                                console.log("BEFORE ERROR.........")
         // KEEP LOADING ELEMENT ON THE TOP AFTER REPLACEMENT
         $(`#individual-search-result-${uniqueId}`)[0].scrollIntoView(true);  // instant scroll - no animation/smoothness
         // $(`#individual-search-result-${uniqueId}`)[0].scrollIntoView({
         //     behavior: "smooth",  // Smooth animation
         //     block: "start"       // Align to top
         // });
-
+                        console.log("BEFORE ERROR.........")
         $('#image-carousel-left-arrow').on('click', function () {
             $('#image-carousel-container').animate({
                 scrollLeft: $('#image-carousel-container').scrollLeft() - 750 // Scroll left by 750px
@@ -690,7 +696,8 @@ window.bindSearchHandler = function () {
                     query: form.get("prompt"),
                     links: links,
                     images: images,
-                    content: content
+                    content: content,
+                    search_result_id: response.id
                 };
                 renderSearchResults(mockResponse, loadingHtmlContainerId);
 
