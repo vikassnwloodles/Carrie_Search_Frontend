@@ -16,10 +16,10 @@ window.getCitationHtml = function (citationsMetadata) {
     // Build tooltip items for all citations
     // `<img src="${cit.icon}" alt="favicon" class="w-4 h-4 flex-shrink-0 rounded-full">`
 
-    //     ${cit.icon
-    //     ? `<img src="https://www.google.com/s2/favicons?domain=${cit.site_url}&sz=16">`
-    //     : `<i class="fa-solid fa-globe w-4 h-4 text-gray-600 flex-shrink-0"></i>`
-    // }
+        //     ${cit.icon
+        //     ? `<img src="https://www.google.com/s2/favicons?domain=${cit.site_url}&sz=16">`
+        //     : `<i class="fa-solid fa-globe w-4 h-4 text-gray-600 flex-shrink-0"></i>`
+        // }
     const sourceItemsHtml = citationsMetadata.map(cit => `
     <a href="${cit.site_url}" target="_blank" class="flex items-start gap-3 p-2 rounded hover:bg-gray-100">
         <img src="https://www.google.com/s2/favicons?domain=${cit.site_url}&sz=16">
@@ -71,34 +71,35 @@ function attachEventHandlers(uniqueId) {
 
 
     // Show tooltip when hovering badge OR tooltip itself
-    // $badge.add($tooltip).hover(
-    //     function () {
-    $(document).on("mouseenter", `#citation-badge-${uniqueId}, #citation-tooltip-${uniqueId}`, function () {
-        const badgeOffset = $badge.offset().left;       // left relative to document
-        const $badgeAncestor = $badge.closest('[id^="response-text-"]:not([id^="response-text-inner-"])')
-        const ancestorOffset = $badgeAncestor.offset().left; // left relative to document
-        const badgeRelativeLeft = badgeOffset - ancestorOffset;
-        let requiredShiftFromLeft = badgeRelativeLeft - ((citationTooltipWidth / 2) - (citationBadgeWidth / 2))
+    $badge.add($tooltip).hover(
+        function () {
+            const badgeOffset = $badge.offset().left;       // left relative to document
+            const $badgeAncestor = $badge.closest('[id^="response-text-"]:not([id^="response-text-inner-"])')
+            const ancestorOffset = $badgeAncestor.offset().left; // left relative to document
+            const badgeRelativeLeft = badgeOffset - ancestorOffset;
+            let requiredShiftFromLeft = badgeRelativeLeft - ((citationTooltipWidth / 2) - (citationBadgeWidth / 2))
 
-        // prevent tooltip from going past the left edge
-        requiredShiftFromLeft = requiredShiftFromLeft >= 0 ? requiredShiftFromLeft : 0;
+            // prevent tooltip from going past the left edge
+            requiredShiftFromLeft = requiredShiftFromLeft >= 0 ? requiredShiftFromLeft : 0;
 
-        // prevent tooltip from going past the right edge
-        const badgeParentContainerWidth = $badgeAncestor.outerWidth(); // parent container of the badge
-        if ((requiredShiftFromLeft + citationTooltipWidth) > badgeParentContainerWidth) {
-            requiredShiftFromLeft = (badgeParentContainerWidth - citationTooltipWidth)
+            // prevent tooltip from going past the right edge
+            const badgeParentContainerWidth = $badgeAncestor.outerWidth(); // parent container of the badge
+            if ((requiredShiftFromLeft + citationTooltipWidth) > badgeParentContainerWidth) {
+                requiredShiftFromLeft = (badgeParentContainerWidth - citationTooltipWidth)
+            }
+
+            $tooltip.css({
+                // left: `${badgeOffset.left-tooltipOffset.left}px`,
+                left: `${requiredShiftFromLeft}px`
+            })
+
+            clearTimeout(hideTimeout);
+            $tooltip.removeClass("opacity-0 invisible").addClass("opacity-100 visible");
+        },
+        function () {
+            hideTimeout = setTimeout(() => {
+                $tooltip.removeClass("opacity-100 visible").addClass("opacity-0 invisible");
+            }, 100);
         }
-
-        $tooltip.css({
-            // left: `${badgeOffset.left-tooltipOffset.left}px`,
-            left: `${requiredShiftFromLeft}px`
-        })
-
-        clearTimeout(hideTimeout);
-        $tooltip.removeClass("opacity-0 invisible").addClass("opacity-100 visible");
-    }).on("mouseleave", `#citation-badge-${uniqueId}, #citation-tooltip-${uniqueId}`, function () {
-        hideTimeout = setTimeout(() => {
-            $tooltip.removeClass("opacity-100 visible").addClass("opacity-0 invisible");
-        }, 100);
-    })
+    );
 }

@@ -672,6 +672,7 @@ window.cleanSearchResultPage = function () {
     $("#footer").addClass("hidden");  // HIDE FOOTER
     $("#dummy-footer").removeClass("hidden");  // SHOW DUMMY FOOTER FOR BOTTOM OFFSET PREVENTING CONTENT OVERLAP WITH SEARCH BOX
     $("#search-form").css({ "position": "fixed", "bottom": "-20px" });  // MAKE SEARCH BOX FIX TO THE BOTTOM
+    $("#search-form").removeClass("w-full").addClass("mx-auto left-24 right-8");  // MAKE BOTTOM FIXED SEARCH BOX WIDTH DYNAMIC ON WINDOW RESIZE
     $("#ai_search").attr("data-placeholder", "Inquire Further, Ask Another Question");  // UPDATE SEARCH BOX PLACEHOLDER
     hideUploadedFileMetadataBox();  // HIDE PREVIOUSLY SELECTED FILE METADATA BOX
     autoGrowSearchBox(document.getElementById("ai_search"));  // RESET SEARCH BOX HEIGHT
