@@ -1,7 +1,7 @@
 window.home_content = `
 <div id="search-results-container" class="w-full max-w-4xl hidden"></div>
 
-<form id="search-form" class="w-full max-w-4xl pb-12 bg-[#fcfcf9] rounded-xl">
+<form id="search-form" class="z-10 w-full max-w-4xl pb-12 bg-[#fcfcf9] rounded-xl">
     <div class="relative flex items-center rounded-xl" style="box-shadow: 0 -5px 10px rgba(248, 248, 240, 1)">
         <div id="searchbox_parent_div"
             class="w-full border border-gray-200 rounded-xl p-2 pb-12 bg-white shadow-sm transition-shadow focus-within:outline-none focus-within:ring-2 focus-within:ring-teal-500"

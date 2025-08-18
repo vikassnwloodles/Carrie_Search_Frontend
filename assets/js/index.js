@@ -12,6 +12,8 @@ import "./handlers/handle_change_password.js"
 import "./handlers/handle_user_profile.js"
 import "./handlers/search_handlers/handle_search.js"
 
+import "./apis/search_api.js"
+
 import "./utils.js"
 
 
@@ -66,66 +68,72 @@ $(document).ready(function () {
                     return response.json();
                 })
                 .then(data => {
-                    var links = [];
-                    var content = null;
-                    var images = [];
-                    var response = data.response
+                    cleanSearchResultPage()
+                    const searchResultHtml = getSearchResultHtml(data)
+                    $("#search-results-container").append(searchResultHtml).show()
 
-                    if (response && response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
-                        var searchContent = response.choices[0].message.content;
+                    // var links = [];
+                    // var content = null;
+                    // var images = [];
+                    // var response = data.response
 
-                        if (response.search_results) {
-                            for (let index = 0; index < response.search_results.length; index++) {
-                                const element = response.search_results[index];
-                                links.push({ title: element.title, url: element.url });
-                            }
-                        }
+                    // if (response && response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
+
+                        // var searchContent = response.choices[0].message.content;
+
+                        // if (response.search_results) {
+                        //     for (let index = 0; index < response.search_results.length; index++) {
+                        //         const element = response.search_results[index];
+                        //         links.push({ title: element.title, url: element.url });
+                        //     }
+                        // }
 
 
-                        if (response.images) {
-                            for (let index = 0; index < response.images.length; index++) {
-                                const img = response.images[index];
-                                images.push({ src: img.image_url, url: img.origin_url });
-                            }
-                        }
+                        // if (response.images) {
+                        //     for (let index = 0; index < response.images.length; index++) {
+                        //         const img = response.images[index];
+                        //         images.push({ src: img.image_url, url: img.origin_url });
+                        //     }
+                        // }
 
-                        content = structuredData(searchContent);
+                        // content = structuredData(searchContent);
 
-                        const mockResponse = {
-                            query: data.prompt,
-                            links: links,
-                            images: images,
-                            content: content,
-                            search_result_id: response.id
-                        };
-                        const $searchToastBox = $(searchToastBox.trim());
-                        $searchToastBox.attr("id", "loading-message").text("Please standby, Pete is working to make your life and work easier...!")
-                        $searchToastBox.addClass("animate-fade-in text-gray-500").removeClass("text-red-500 mb-8")
-                        const dynamicHeight = $('#dynamic-content-container').height();
-                        const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());
-                        // $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');
-                        $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 150 + 'px');
+                        // const mockResponse = {
+                        //     query: data.prompt,
+                        //     links: links,
+                        //     images: images,
+                        //     content: content,
+                        //     search_result_id: response.id,
+                        //     relatedQuestions: response.related_questions
+                        // };
+                        // const $searchToastBox = $(searchToastBox.trim());
+                        // $searchToastBox.attr("id", "loading-message").text("Please standby, Pete is working to make your life and work easier...!")
+                        // $searchToastBox.addClass("animate-fade-in text-gray-500").removeClass("text-red-500 mb-8")
+                        // const dynamicHeight = $('#dynamic-content-container').height();
+                        // const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());
+                        // // $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 32 + 'px');
+                        // $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 150 + 'px');
 
+                        // // const loadingHtml = $searchToastBox.prop("outerHTML");
+                        // let loadingHtmlContainerId = "loading-message-" + Date.now(); // or any unique logic
+                        // $searchToastBox.attr("id", loadingHtmlContainerId);
                         // const loadingHtml = $searchToastBox.prop("outerHTML");
-                        let loadingHtmlContainerId = "loading-message-" + Date.now(); // or any unique logic
-                        $searchToastBox.attr("id", loadingHtmlContainerId);
-                        const loadingHtml = $searchToastBox.prop("outerHTML");
-                        $('#search-results-container').append(loadingHtml).show();
-                        renderSearchResults(mockResponse, loadingHtmlContainerId);
+                        // $('#search-results-container').append(loadingHtml).show();
+                        // renderSearchResults(mockResponse, loadingHtmlContainerId);
 
-                        $(".main-logo").addClass("hidden");
-                        $("#footer").addClass("hidden");
-                        $("#dummy-footer").removeClass("hidden");
-                        $("#search-form").css({ "position": "fixed", "bottom": "-20px" });
+                        // $(".main-logo").addClass("hidden");
+                        // $("#footer").addClass("hidden");
+                        // $("#dummy-footer").removeClass("hidden");
+                        // $("#search-form").css({ "position": "fixed", "bottom": "-20px" });
 
-                    } else if (data.error) {
-                        const toastOptions = [{
-                            title: "Chat not found!",
-                            message: "",
-                            type: "warning"
-                        }]
-                        showToast({ toastOptions })
-                    }
+                    // } else if (data.error) {
+                    //     const toastOptions = [{
+                    //         title: "Chat not found!",
+                    //         message: "",
+                    //         type: "warning"
+                    //     }]
+                    //     showToast({ toastOptions })
+                    // }
                 })
                 .catch(error => {
                     console.error('Error:', error);

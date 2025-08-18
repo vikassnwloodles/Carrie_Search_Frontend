@@ -1,3 +1,12 @@
+import "./html_content/search_query_container.js"
+import "./html_content/search_images_container.js"
+import "./html_content/search_response_container.js"
+import "./html_content/search_export_options.js"
+import "./html_content/citation_html.js"
+import "../js/apis/upload_file_api.js"
+import "../js/apis/search_api.js"
+
+
 const urlParams = new URLSearchParams(window.location.search);
 window.reset_password_uidb64 = urlParams.get('uidb64');
 window.reset_password_token = urlParams.get('token');
@@ -63,12 +72,12 @@ function removeFootnotes(text) {
     return text.replace(/\s*\[\d+\](\[\d+\])*\s*$/, '').trim();
 }
 
-function buildTable(rows) {
+function buildTable(rows, citationsMetadata) {
     if (rows.length < 2) {
         return '';
     }
 
-    var tableHtml = '<table class="min-w-full divide-y divide-gray-200 mt-4 border border-gray-200 rounded-lg overflow-hidden">';
+    var tableHtml = '<table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">';
     var headerRow = rows[0];
     var dataRows = rows.slice(2);
 
@@ -84,7 +93,9 @@ function buildTable(rows) {
         tableHtml += '<tr>';
         var cells = rowStr.substring(1, rowStr.length - 1).split('|');
         $.each(cells, function (cellIdx, cellContent) {
-            tableHtml += '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' + parseItalic(parsebold(removeFootnotes(cellContent))) + '</td>';
+            // GET MAIN TEXT AND CITATIONS HTML
+            const [mainText, citationsHtml] = getMainTextAndCitationsHtml(cellContent, citationsMetadata)
+            tableHtml += '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' + parseItalic(parsebold(removeFootnotes(mainText))) + citationsHtml + '</td>';
         });
         tableHtml += '</tr>';
     });
@@ -94,16 +105,21 @@ function buildTable(rows) {
     return tableHtml;
 }
 
-window.structuredData = function (rawText) {
+
+window.structuredData = function (rawText, citationsMetadata) {
     var rawText = rawText.replace(/<think>.*?<\/think>/gs, '');
+    // Remove newlines immediately after \[ or before \]
+    // rawText = rawText.replace(/\\\[([\s\S]*?)\\\]/g, (_, expr) => `\\[${expr.replace(/\n/g,'')}\\]`);
+    rawText = rawText.replace(/\\\[\s*([\s\S]*?)\s*\\\]/g, (_, expr) => `\\[${expr}\\]`);
+
     var lines = rawText.split('\n');
 
-    // REPLACING --- WITH <hr> (<hr> is HTML equivalent to ---)
-    for (var i = 0; i < lines.length; i++) {
-        if (lines[i].trim() === '---') {
-            lines[i] = '<hr class="my-6 border-t border-gray-300">';
-        }
-    }
+    // // REPLACING --- WITH <hr> (<hr> is HTML equivalent to ---)
+    // for (var i = 0; i < lines.length; i++) {
+    //     if (lines[i].trim() === '---') {
+    //         lines[i] = '<hr class="my-6 border-t border-gray-300">';
+    //     }
+    // }
 
     var htmlBuilder = [];
     var inList = false;
@@ -113,8 +129,42 @@ window.structuredData = function (rawText) {
     var currentCodeLines = [];
     var codeLang = '';
 
+
+    function handleHeading(level, text) {
+        // Close list if open
+        if (inList) {
+            htmlBuilder.push('</ul>');
+            inList = false;
+        }
+        // Close table if open
+        if (inTable) {
+            htmlBuilder.push(buildTable(currentTableLines, citationsMetadata));
+            currentTableLines = [];
+            inTable = false;
+        }
+        // Map heading levels to Tailwind classes
+        const headingClasses = {
+            1: 'text-3xl font-bold mt-6 mb-3',
+            2: 'text-2xl font-semibold mt-4 mb-2',
+            3: 'text-xl font-semibold mt-4 mb-2',
+            4: 'text-lg font-semibold mt-3 mb-1.5',
+            5: 'text-base font-semibold mt-2 mb-1',
+            6: 'text-sm font-semibold mt-1 mb-0.5'
+        };
+        htmlBuilder.push(
+            `<h${level} class="${headingClasses[level] || 'text-base font-semibold'}">${parseItalic(parsebold(text))}</h${level}>`
+        );
+    }
+
+
     $.each(lines, function (i, line) {
         var trimmedLine = line.trim();
+
+        // REPLACING --- WITH <hr> (<hr> is HTML equivalent to ---)
+        if (trimmedLine === '---') {
+            htmlBuilder.push('<hr class="my-6 border-t border-gray-300">')
+            return
+        }
 
         if (trimmedLine.startsWith('```')) {
             if (inCodeBlock) {
@@ -140,46 +190,60 @@ window.structuredData = function (rawText) {
                 inList = false;
             }
             if (inTable) {
-                htmlBuilder.push(buildTable(currentTableLines));
+                htmlBuilder.push(buildTable(currentTableLines, citationsMetadata));
                 currentTableLines = [];
                 inTable = false;
             }
             return;
         }
 
-        if (trimmedLine.startsWith('### ')) {
-            if (inList) {
-                htmlBuilder.push('</ul>');
-                inList = false;
-            }
-            if (inTable) {
-                htmlBuilder.push(buildTable(currentTableLines));
-                currentTableLines = [];
-                inTable = false;
-            }
-            htmlBuilder.push('<h3 class="text-xl font-semibold mt-4 mb-2">' + parseItalic(parsebold(trimmedLine.substring(4).trim())) + '</h3>');
-        } else if (trimmedLine.startsWith('## ')) {
-            if (inList) {
-                htmlBuilder.push('</ul>');
-                inList = false;
-            }
-            if (inTable) {
-                htmlBuilder.push(buildTable(currentTableLines));
-                currentTableLines = [];
-                inTable = false;
-            }
-            htmlBuilder.push('<h2 class="text-2xl font-semibold mt-4 mb-2">' + parseItalic(parsebold(trimmedLine.substring(3).trim())) + '</h2>');
-        } else if (trimmedLine.startsWith('- ')) {
+        // if (trimmedLine.startsWith('### ')) {
+        //     if (inList) {
+        //         htmlBuilder.push('</ul>');
+        //         inList = false;
+        //     }
+        //     if (inTable) {
+        //         htmlBuilder.push(buildTable(currentTableLines, citationsMetadata));
+        //         currentTableLines = [];
+        //         inTable = false;
+        //     }
+        //     htmlBuilder.push('<h3 class="text-xl font-semibold mt-4 mb-2">' + parseItalic(parsebold(trimmedLine.substring(4).trim())) + '</h3>');
+        // } else if (trimmedLine.startsWith('## ')) {
+        //     if (inList) {
+        //         htmlBuilder.push('</ul>');
+        //         inList = false;
+        //     }
+        //     if (inTable) {
+        //         htmlBuilder.push(buildTable(currentTableLines, citationsMetadata));
+        //         currentTableLines = [];
+        //         inTable = false;
+        //     }
+        //     htmlBuilder.push('<h2 class="text-2xl font-semibold mt-4 mb-2">' + parseItalic(parsebold(trimmedLine.substring(3).trim())) + '</h2>');
+        // } 
+
+
+        // Usage: dynamically detect heading level
+        const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.*)$/);
+        if (headingMatch) {
+            const level = headingMatch[1].length;       // number of #
+            const text = headingMatch[2].trim();
+            handleHeading(level, text);
+        }
+        else if (trimmedLine.startsWith('- ')) {
             if (!inList) {
                 htmlBuilder.push('<ul class="list-disc list-inside ml-4 my-2">');
                 inList = true;
             }
             if (inTable) {
-                htmlBuilder.push(buildTable(currentTableLines));
+                htmlBuilder.push(buildTable(currentTableLines, citationsMetadata));
                 currentTableLines = [];
                 inTable = false;
             }
-            htmlBuilder.push('<li class="text-gray-700">' + parseItalic(parsebold(trimmedLine.substring(2).trim())) + '</li>');
+
+            // GET MAIN TEXT AND CITATIONS HTML
+            const [mainText, citationsHtml] = getMainTextAndCitationsHtml(trimmedLine, citationsMetadata)
+
+            htmlBuilder.push('<li class="text-gray-700">' + parseItalic(parsebold(mainText.substring(2).trim())) + citationsHtml + '</li>');
         }
 
         else if (trimmedLine.startsWith('|') && trimmedLine.endsWith('|')) {
@@ -197,11 +261,15 @@ window.structuredData = function (rawText) {
                 inList = false;
             }
             if (inTable) {
-                htmlBuilder.push(buildTable(currentTableLines));
+                htmlBuilder.push(buildTable(currentTableLines, citationsMetadata));
                 currentTableLines = [];
                 inTable = false;
             }
-            htmlBuilder.push('<p class="text-gray-700 leading-relaxed my-2">' + parseItalic(parsebold(trimmedLine)) + '</p>');
+
+            // GET MAIN TEXT AND CITATIONS HTML
+            const [mainText, citationsHtml] = getMainTextAndCitationsHtml(trimmedLine, citationsMetadata)
+
+            htmlBuilder.push('<p class="text-gray-700 leading-relaxed my-2">' + parseItalic(parsebold(mainText)) + citationsHtml + '</p>');
         }
     });
 
@@ -209,14 +277,52 @@ window.structuredData = function (rawText) {
         htmlBuilder.push('</ul>');
     }
     if (inTable) {
-        htmlBuilder.push(buildTable(currentTableLines));
+        htmlBuilder.push(buildTable(currentTableLines, citationsMetadata));
     }
     if (inCodeBlock && currentCodeLines.length > 0) {
         htmlBuilder.push('<pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto my-2"><code class="language-' + codeLang + '">' + currentCodeLines.join('\n') + '</code></pre>');
     }
 
-    return htmlBuilder.join('');
+
+    let content = htmlBuilder.join('');
+
+    // wrap tables
+    content = content.replace(/<table([\s\S]*?)<\/table>/g, function (match) {
+        return `<div class="overflow-x-auto w-full my-4 rounded-md border border-gray-200">${match}</div>`;
+    });
+
+    // create a temporary container element
+    const container = document.createElement('div');
+    container.innerHTML = content;
+
+    // render KaTeX formulas inside the container
+    renderMathInElement(container, {
+        delimiters: [
+            { left: "\\[", right: "\\]", display: true },
+            { left: "\\(", right: "\\)", display: false }
+        ],
+        throwOnError: false
+    });
+
+    // return the processed HTML string
+    return container.innerHTML;
 }
+
+
+function getMainTextAndCitationsHtml(trimmedLine, citationsMetadata) {
+    // EXTRACT CITATION NUMBERS SUCH AS 1, 2... FROM `trimmedLine`
+    let citationNumbers = (trimmedLine.match(/\[(\d+)\]/g) || []).map(c => parseInt(c.replace(/\[|\]/g, ""), 10));
+    // REMOVE THE [n] MARKERS FROM THE MAIN TEXT
+    const mainText = trimmedLine.replace(/\[\d+\]/g, "").trim();
+    let citationsHtml = "";
+    if (citationNumbers.length > 0) {
+        // FILTER OUT CITATIONS METADATA BASE ON EXTRACTED CITATION NUMBERS
+        const citationsMetadataFiltered = citationNumbers.map(number => citationsMetadata[number - 1])
+        citationsHtml = getCitationHtml(citationsMetadataFiltered)
+    }
+    return [mainText, citationsHtml];
+}
+
 
 window.fetchSubscriptionStatus = function () {
     return new Promise((resolve, reject) => {
@@ -556,4 +662,188 @@ window.getHtmlStringHeight = function (htmlString) {
     $temp.remove(); // clean up
 
     return height;
+}
+
+
+window.cleanSearchResultPage = function () {
+    $("#ai_search").text("").blur();  // REMOVE OLD TEXT AND APPLY BLUR TO HIDE CHROME SUGGESTIONS
+    $("#ai_search").focus();  // KEEP FOCUS ON SEARCH BOX
+    $(".main-logo").addClass("hidden");  // HIDE PETE LOGO FROM TOP
+    $("#footer").addClass("hidden");  // HIDE FOOTER
+    $("#dummy-footer").removeClass("hidden");  // SHOW DUMMY FOOTER FOR BOTTOM OFFSET PREVENTING CONTENT OVERLAP WITH SEARCH BOX
+    $("#search-form").css({ "position": "fixed", "bottom": "-20px" });  // MAKE SEARCH BOX FIX TO THE BOTTOM
+    $("#ai_search").attr("data-placeholder", "Inquire Further, Ask Another Question");  // UPDATE SEARCH BOX PLACEHOLDER
+    hideUploadedFileMetadataBox();  // HIDE PREVIOUSLY SELECTED FILE METADATA BOX
+    autoGrowSearchBox(document.getElementById("ai_search"));  // RESET SEARCH BOX HEIGHT
+}
+
+
+window.getSearchResultHtml = function (data) {
+    const response = data.response;
+    const citationsMetadata = data.response.citations_metadata;
+    const searchQuery = data.prompt;
+    const links = []
+    const images = []
+
+    if (response.search_results) {
+        for (let index = 0; index < response.search_results.length; index++) {
+            const element = response.search_results[index];
+            links.push({ title: element.title, url: element.url });
+        }
+    }
+
+    if (response.images) {
+        for (let index = 0; index < response.images.length; index++) {
+            const img = response.images[index];
+            images.push({ src: img.image_url, url: img.origin_url });
+        }
+    }
+
+    const searchContent = response.choices[0].message.content
+    const content = structuredData(searchContent, citationsMetadata);
+
+    // const searchResultId = response.id
+    const searchResultId = response.pk
+    const uniqueId = Date.now() + Math.floor(Math.random() * 1000); // ensure uniqueness
+    const relatedQuestions = response.related_questions
+
+    const resultsHtml = `
+            <div id="${searchResultId}">
+                <div
+                    class="animate-fade-in text-left mb-8 p-6 bg-white rounded-lg border border-gray-200 relative">
+                    ${renderSearchQueryContainer(searchQuery, uniqueId, searchResultId)}
+                    ${renderSearchImagesContainer(images)}
+                    ${renderSearchResponseContainer(content, uniqueId)}
+                    ${renderSearchExportOptions(searchResultId, uniqueId)}
+                </div>
+                ${renderRelatedQuestionsContainer(relatedQuestions, uniqueId)}
+            </div>
+            `
+
+    return resultsHtml
+}
+
+
+let ongoingSearchRequest = null;
+let loadingHtmlContainerId = null;
+window.renderSearchResult = async function (searchQuery, searchResultId = null) {
+    if ($('#search-form-btn i').hasClass('fa-stop')) {
+        if (ongoingSearchRequest) {
+            ongoingSearchRequest.abort();
+            ongoingSearchRequest = null;
+
+            $('#search-form-btn i').addClass('fa-arrow-right').removeClass('fa-stop');
+
+            $(`#${loadingHtmlContainerId}`)
+                .text("Search aborted.").
+                removeClass("text-gray-500")
+                .addClass("text-red-500");
+        }
+        return;
+    }
+
+    const fileSelected = $('#file-upload')[0].files[0];
+    const token = localStorage.getItem('accessToken');
+    // const searchQueryData = $('#ai_search').html().replace(/<br\s*\/?>/gi, '\n');
+    // if (searchQueryData === "") return;
+    if (searchQuery === "") return;
+
+    cleanSearchResultPage()
+    $('#search-form-btn i').removeClass('fa-arrow-right').addClass('fa-stop');  // UPDATE SEARCH BOX SUBMIT ICON
+    $('#center-content-wrapper').removeClass('justify-center');
+
+    if (!token) {
+        const $searchToastBox = $(searchToastBox.trim());
+        $searchToastBox.text("Please log in to perform a search.");
+        $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
+        $('#search-form-btn i').addClass('fa-arrow-right').removeClass('fa-stop');
+        return;
+    }
+
+    let imageUrl = "";
+    if (fileSelected) {
+        try {
+            const response = await call_upload_file_api(fileSelected)
+            const responseData = JSON.parse(response);
+            searchQuery = (responseData.text_content ? `${responseData.text_content}\n\n\n${searchQuery}` : searchQuery);
+            imageUrl = responseData.image_url
+            $('#file-upload').val('');
+        } catch (error) {
+            const $searchToastBox = $(searchToastBox.trim());
+            $searchToastBox.text("Image upload failed. Please try again.");
+            $('#search-results-container').append($searchToastBox.prop("outerHTML")).show();
+        };
+    }
+
+    const $searchToastBox = $(searchToastBox.trim());
+    $searchToastBox.attr("id", "loading-message").text("Please standby, Pete is working to make your life and work easier...!")
+    $searchToastBox.addClass("animate-fade-in text-gray-500").removeClass("text-red-500 mb-8")
+    const dynamicHeight = $('#dynamic-content-container').height();
+    const searchToastBoxHeight = getHtmlStringHeight(searchToastBox.trim());
+    $searchToastBox.css('margin-bottom', dynamicHeight - searchToastBoxHeight - 150 + 'px');
+    loadingHtmlContainerId = "loading-message-" + Date.now(); // or any unique logic
+    $searchToastBox.attr("id", loadingHtmlContainerId);
+    const loadingHtml = $searchToastBox.prop("outerHTML");
+
+    if (searchResultId) {
+        const $loadingElement = $(loadingHtml); // Convert string to jQuery element
+        $loadingElement.css('margin-bottom', '32px'); // Apply CSS
+        $(`#${searchResultId}`).replaceWith($loadingElement); // Replace
+
+        // KEEP LOADING ELEMENT ON THE TOP AFTER REPLACEMENT
+        $(`#${loadingHtmlContainerId}`)[0].scrollIntoView({
+            behavior: "smooth",  // Smooth animation
+            block: "start"       // Align to top
+        });
+    }
+    else {
+        $('#search-results-container').append(loadingHtml).show();
+        // SMOOTH SCROLL TO THE BOTTOM SENDING PREVIOUS SEARCH RESULTS OUT OF VIEWPORT MAKING ROOM FOR NEW SEARCH RESULT
+        $('#dynamic-content-container').animate({
+            scrollTop: $('#dynamic-content-container')[0].scrollHeight
+        }, 500);
+    }
+
+
+    ongoingSearchRequest = call_search_api({ searchQuery, imageUrl, searchResultId })
+    ongoingSearchRequest.then(response => {
+        const data = {
+            "response": response,
+            "prompt": searchQuery
+        }
+        const resultsHtml = getSearchResultHtml(data)
+        const $resultsHtml = $(resultsHtml);
+        $(`#${loadingHtmlContainerId}`).replaceWith($resultsHtml);
+
+        // KEEP `resultsHtml` IN VIEWPORT AFTER REPLACEMENT
+        $resultsHtml[0].scrollIntoView(true);  // instant scroll - no animation/smoothness
+
+        // // Render KaTeX formulas inside the new content
+        // renderMathInElement($resultsHtml[0], {
+        //     delimiters: [
+        //         { left: "\\[", right: "\\]", display: true },
+        //         { left: "\\(", right: "\\)", display: false }
+        //     ],
+        //     throwOnError: false
+        // });
+    })
+        .catch(error => {
+            // HANDLE INVALID PERPLEXITY KEY ERROR
+            if (error.status === 502) {
+                $(`#${loadingHtmlContainerId}`)
+                    .text("We’re unable to retrieve data right now. Please try again shortly.").
+                    removeClass("text-gray-500")
+                    .addClass("text-red-500");
+                return
+            }
+
+            if (error.statusText === 'abort') {
+                return; // ignore aborted error
+            }
+
+            showToast({ response: error })
+        })
+        .always(() => {
+            $('#search-form-btn i').addClass('fa-arrow-right').removeClass('fa-stop');
+        });
 }
